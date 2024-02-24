@@ -19,6 +19,14 @@ module kiosk_practice::kiosk_trial {
     };
 
 
+    // errors
+    const ENotOneTimeWitness: u64 = 0;
+    const ETypeNotFromModule: u64 = 1;
+
+
+
+
+
     // centralized location to give access to the collectibles
     struct Registry has key {
         id: UID,
@@ -68,9 +76,18 @@ module kiosk_practice::kiosk_trial {
     }
 
     
-    public fun mint_object_to_kiosk(ctx: &mut TxContext) {
+
+    public fun start_game<OTW: drop, T: store>(otw: OTW, ctx: &mut TxContext ) {
+        assert!(sui::types::is_one_time_witness(&otw), ENotOneTimeWitness);    
         
-       
+        let publisher = package::claim(otw, ctx);
+
+        assert!(package::from_module<T>(&publisher), ETypeNotFromModule);
+        transfer::transfer(PredictionTicket<T> {
+            id: object::new(ctx),
+            publisher,
+        }, tx_context::sender(ctx));
+    
 
     }
 
