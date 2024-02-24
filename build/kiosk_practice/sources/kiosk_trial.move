@@ -92,6 +92,36 @@ module kiosk_practice::kiosk_trial {
     }
 
 
+    // use the Prediction ticket to start a new game instance and recieve the prediction cap
+    public fun create_game<T: store>(
+        registry: &Registry,
+        ticket: PredictionTicket<T>, 
+        ctx: &mut TxContext,
+    ) : PredictionCap<T> {
+        let PredictionTicket { id, publisher } = ticket; 
+        object::delete(id);
+        
+        let display = display::new<Prediction<T>>(&registry.publisher, ctx);
+        let ( policy, policy_cap ) = policy::new<Prediction<T>>( &registry.publisher, ctx);
+
+        transfer::public_share_object(policy);
+
+        PredictionCap<T> {
+            id: object::new(ctx),
+            display: borrow::new(display, ctx),
+            publisher: borrow::new(publisher, ctx),
+            policy_cap: borrow::new(policy_cap, ctx),
+            minted: 0,
+        }
+
+    }
+
+
+
+
+
+
+
 
 
 
