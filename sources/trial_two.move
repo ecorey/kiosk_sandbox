@@ -36,7 +36,7 @@ module kiosk_practice::kiosk_practice_two {
     }
 
 
-    public fun min() {
+    public fun mint() {
 
     }
 
