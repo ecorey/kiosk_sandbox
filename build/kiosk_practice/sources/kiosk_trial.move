@@ -140,9 +140,6 @@ module kiosk_practice::kiosk_trial {
 
     ) : Prediction<T> {
 
-
-       
-
         event::emit(PredictionMade {
            
             made_by: tx_context::sender(ctx),
@@ -151,7 +148,6 @@ module kiosk_practice::kiosk_trial {
 
         cap.minted = cap.minted + 1;
 
-       
 
         Prediction {
             id: object::new(ctx),
@@ -170,6 +166,46 @@ module kiosk_practice::kiosk_trial {
 
 
     // BORROW METHODS
+
+    // take the transfer policy cap from the prediction cap
+    public fun borrow_policy_cap<T: store>(
+        self: &mut PredictionCap<T>,
+    ) : ( TransferPolicyCap<Prediction<T>>, Borrow) {
+        borrow::borrow(&mut self.policy_cap)
+    }
+
+
+    // return transfer policy cap to the prediction cap
+    public fun return_policy_cap<T: store>(
+        self: &mut PredictionCap<T>,
+        cap: TransferPolicyCap<Prediction<T>>,
+        borrow: Borrow,
+    ) {
+        borrow::put_back(&mut self.policy_cap, cap, borrow)
+    }
+
+
+    // take the display from the prediction cap
+    public fun borrow_display<T: store>(
+        self: &mut PredictionCap<T>
+    ) : ( Display<Prediction<T>>, Borrow) {
+        borrow::borrow(&mut self.display)
+    }
+
+
+    // return the display to the prediction cap
+    public fun return_display<T: store>(
+        self: &mut PredictionCap<T>,
+        display: Display<Prediction<T>>,
+        borrow: Borrow,
+    ) {
+        borrow::put_back(&mut self.display, display, borrow)
+    }
+
+
+    // take the publisher from the prediction cap
+    
+
 
 
 
