@@ -72,7 +72,8 @@ module kiosk_practice::kiosk_trial {
     // event emitted when a prediction is made
     // add ID to the event to connect to the prediction
     struct PredictionMade has copy, drop {
-       
+        demo_event: Option<String>,
+        repub_event: Option<String>,
         made_by: address,
     }
 
@@ -141,7 +142,8 @@ module kiosk_practice::kiosk_trial {
     ) : Prediction<T> {
 
         event::emit(PredictionMade {
-           
+            demo_event: demo,
+            repub_event: repub,
             made_by: tx_context::sender(ctx),
         });
 
@@ -204,7 +206,7 @@ module kiosk_practice::kiosk_trial {
 
 
     // take the publisher from the prediction cap
-    
+
 
 
 
