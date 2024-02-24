@@ -117,8 +117,34 @@ module kiosk_practice::kiosk_trial {
     }
 
 
+    // MAKE PREDICTION
+    public fun make_prediction<T: store> (
+
+        cap: &mut PredictionCap<T>,
+        image_url: String,
+        name: Option<String>,
+        demo: Option<String>,
+        repub: Option<String>,
+        meta: Option<T>,
+        ctx: &mut TxContext,
+
+    ) : Prediction<T> {
+
+        cap.minted = cap.minted + 1;
+
+        Prediction {
+            id: object::new(ctx),
+            image_url,
+            demo,
+            repub,
+            meta,
+        }
+
+    }
 
 
+
+    // BORROW METHODS
 
 
 
