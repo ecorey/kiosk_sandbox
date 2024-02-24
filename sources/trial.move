@@ -20,11 +20,11 @@ module kiosk_practice::kiosk_trial {
     };
 
 
+
+
     // errors
     const ENotOneTimeWitness: u64 = 0;
     const ETypeNotFromModule: u64 = 1;
-
-
 
 
 
@@ -33,8 +33,6 @@ module kiosk_practice::kiosk_trial {
         id: UID,
         publisher: Publisher,
     }
-
-
 
 
     // prediction cap for display, policycap, and publisher
@@ -87,7 +85,7 @@ module kiosk_practice::kiosk_trial {
     }
 
     
-
+    // start the game with the one time witness and store the prediction ticket
     public fun start_game<OTW: drop, T: store>(otw: OTW, ctx: &mut TxContext ) {
         assert!(sui::types::is_one_time_witness(&otw), ENotOneTimeWitness);    
         
@@ -99,11 +97,10 @@ module kiosk_practice::kiosk_trial {
             publisher,
         }, tx_context::sender(ctx));
     
-
     }
 
 
-    // use the Prediction ticket to start a new game instance and recieve the prediction cap
+    // use the prediction ticket to start a new game instance and recieve the prediction cap
     public fun create_game<T: store>(
         registry: &Registry,
         ticket: PredictionTicket<T>, 
@@ -129,6 +126,7 @@ module kiosk_practice::kiosk_trial {
 
 
     // MAKE PREDICTION
+    // event emites the demo, repub, and address of the sender making the prediction
     public fun make_prediction<T: store> (
 
         cap: &mut PredictionCap<T>,
@@ -147,10 +145,10 @@ module kiosk_practice::kiosk_trial {
             made_by: tx_context::sender(ctx),
         });
 
-
+        // increment the minted count by one each prediction made
         cap.minted = cap.minted + 1;
 
-
+        // returns the prediction object
         Prediction {
             id: object::new(ctx),
             image_url,
@@ -158,10 +156,6 @@ module kiosk_practice::kiosk_trial {
             repub,
             meta,
         }
-
-       
-
-        
 
     }
 
