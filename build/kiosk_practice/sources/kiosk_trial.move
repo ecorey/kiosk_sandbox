@@ -6,13 +6,14 @@ module kiosk_practice::kiosk_trial {
     use sui::tx_context::{Self, TxContext};
     use sui::coin::{Self, Coin};
     use sui::table::{Self, Table};
-    use sui::object::{Self, UID};
+    use sui::object::{Self, UID, ID};
     use std::vector as vec;
     use std::string::String;
     use std::option::{Self, Option};
     use sui::package::{Self, Publisher};
     use sui::display::{Self, Display};
     use sui::borrow::{Self, Referent, Borrow};
+    use sui::event;
     use sui::transfer_policy::{
         Self as policy,
         TransferPolicyCap
@@ -63,8 +64,17 @@ module kiosk_practice::kiosk_trial {
         meta: Option<T>, 
     }
 
+
     // otw
     struct KIOSK_TRIAL has drop {}
+
+
+    // event emitted when a prediction is made
+    // add ID to the event to connect to the prediction
+    struct PredictionMade has copy, drop {
+       
+        made_by: address,
+    }
 
 
     // init to create the registry and provide access to publisher
@@ -130,7 +140,18 @@ module kiosk_practice::kiosk_trial {
 
     ) : Prediction<T> {
 
+
+       
+
+        event::emit(PredictionMade {
+           
+            made_by: tx_context::sender(ctx),
+        });
+
+
         cap.minted = cap.minted + 1;
+
+       
 
         Prediction {
             id: object::new(ctx),
@@ -139,6 +160,10 @@ module kiosk_practice::kiosk_trial {
             repub,
             meta,
         }
+
+       
+
+        
 
     }
 
