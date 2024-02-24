@@ -200,10 +200,29 @@ module kiosk_practice::kiosk_trial {
 
 
     // take the publisher from the prediction cap
+    public fun borrow_publisher<T: store> (
+        self: &mut PredictionCap<T>
+    ) : ( Publisher, Borrow) {
+        borrow::borrow(&mut self.publisher)
+    }
+
+
+    // return the publisher to the prediction cap
+    public fun return_publisher<T: store> (
+        self: &mut PredictionCap<T>,
+        publisher: Publisher,
+        borrow: Borrow
+    ) {
+        borrow::put_back(&mut self.publisher, publisher, borrow)
+    }
 
 
 
 
+    // internal methods
+
+   
+    
 
 
 
