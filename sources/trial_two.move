@@ -275,10 +275,11 @@ module kiosk_practice::kiosk_practice_two {
 
 
 // TODO
+// add central kiosk that sender can withdraw from
 // add transfer policy rules and create the empty_policy function
 // add consts, asserts, and tests
 // add game elements (new, instance, finalize, ext.)
-// add table to store the prediction with an address
+// add table to store the predictions with an address
 // add switchboard oracle prototype
 // ptb for making predictions
 
