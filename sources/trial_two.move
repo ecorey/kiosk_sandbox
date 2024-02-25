@@ -122,18 +122,12 @@ module kiosk_practice::kiosk_practice_two {
 
 
 
-    // create a new game and instance
-    #[allow(lint(share_owned))]
-    public fun new()  {
-    
-    }
-
-
 
     // create a new game
     public fun new_game() {
 
     }
+
 
 
     // new instance
@@ -287,6 +281,15 @@ module kiosk_practice::kiosk_practice_two {
 
 
 }
+
+
+
+// TODO
+// add transfer policy rules and fix the empty_policy function
+// add game elements (new, instance, finalize, ext.)
+// add table to store the prediction with an address
+// add switchboard oracle prototype
+// ptb for making predictions
 
 
 
