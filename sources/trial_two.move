@@ -184,21 +184,11 @@ module kiosk_practice::kiosk_practice_two {
 
     // creates an empty transfer policy and publicly shares it
     // todo create rules for the transfer policy / add royalty rule and floor rule
-    // public fun create_empty_policy( publisher: &Publisher, ctx: &mut TxContext) {
+    public fun create_empty_policy( publisher: &Publisher, ctx: &mut TxContext) {
 
-    //     let (transfer_policy, tp_cap) = tp::new<Prediction>(publisher, ctx);
-        
-        
-    //     let registry = Registry {
-    //         id: object::new(ctx),
-    //         tp: transfer_policy,
-    //     };
+       
 
-
-    //     transfer::public_transfer(tp_cap, tx_context::sender(ctx));
-    //     transfer::public_share_object(transfer_policy);
-
-    // }
+    }
 
 
 
@@ -256,6 +246,7 @@ module kiosk_practice::kiosk_practice_two {
         test_scenario::end(scenario_val);
 
     }
+
 
     // sample test using kiosk test utils
     #[test]
