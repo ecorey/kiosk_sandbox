@@ -4,7 +4,7 @@ module kiosk_practice::kiosk_practice_two {
     use sui::kiosk::{Self, Kiosk, KioskOwnerCap};
     use sui::object::{Self, UID, ID};
     use sui::transfer;
-    use sui::transfer_policy::{Self as tp, TransferPolicy};
+    use sui::transfer_policy::{Self as tp, TransferPolicy, confirm_request};
     use sui::tx_context::{TxContext, Self};
     use sui::package::{Self, Publisher};    
     use std::string::{String};
@@ -14,6 +14,7 @@ module kiosk_practice::kiosk_practice_two {
     use sui::balance::{Self, Balance};
     use sui::sui::SUI;
     use sui::table::Table;
+    use sui::coin::{Self, Coin};    
 
 
 
@@ -122,15 +123,10 @@ module kiosk_practice::kiosk_practice_two {
 
 
     // create a new game and instance
-    // #[allow(lint(share_owned))]
-    // public fun new(_: &GameOwnerCap, coin: String, price: u64, ctx: &mut TxContext)  {
-    //    let instance = new_instance(ctx);
-    //    let game = new_game(&instance, coin, price, ctx);
-
-
-    //    transfer::share_object(game);
-    //    transfer::share_object(instance);
-    // }
+    #[allow(lint(share_owned))]
+    public fun new()  {
+    
+    }
 
 
 
@@ -174,6 +170,7 @@ module kiosk_practice::kiosk_practice_two {
 
 
 
+    // unwraps prediction and locks the kiosk
     public fun unwrap(
 
         prediction_wrapper: PredictionWrapper, 
@@ -190,6 +187,40 @@ module kiosk_practice::kiosk_practice_two {
         kiosk::lock(kiosk, kiosk_cap, _tp, prediction);
     }
 
+
+
+    // creates an empty transfer policy and publicly shares it
+    // todo create rules for the transfer policy / add royalty rule and floor rule
+    // public fun create_empty_policy( publisher: &Publisher, ctx: &mut TxContext) {
+
+    //     let (transfer_policy, tp_cap) = tp::new<Prediction>(publisher, ctx);
+        
+        
+    //     let registry = Registry {
+    //         id: object::new(ctx),
+    //         tp: transfer_policy,
+    //     };
+
+
+    //     transfer::public_transfer(tp_cap, tx_context::sender(ctx));
+    //     transfer::public_share_object(transfer_policy);
+
+    // }
+
+
+
+
+
+    public fun burn_from_kiosk( kiosk: &mut Kiosk, kiosk_cap: &KioskOwnerCap, prediction_id: ID, registry: &mut Registry, ctx: &mut TxContext) {
+
+        let purchase_cap = kiosk::list_with_purchase_cap<Prediction>( kiosk, kiosk_cap, prediction_id, 0, ctx); 
+        let ( prediction, transfer_request)  = kiosk::purchase_with_cap<Prediction>(kiosk, purchase_cap, coin::zero<SUI>(ctx));
+        confirm_request<Prediction>( &registry.tp, transfer_request  );
+
+        let Prediction {id, image_url: _, demo: _, repub: _} = prediction;
+        object::delete(id);
+
+    }
 
 
 
