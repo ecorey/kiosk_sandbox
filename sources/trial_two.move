@@ -21,7 +21,7 @@ module kiosk_practice::kiosk_practice_two {
     const ETypeNotFromModule: u64 = 1;
 
 
-
+    // OTW for the kiosk init function
     struct KIOSK_PRACTICE_TWO has drop {}
 
 
@@ -34,13 +34,14 @@ module kiosk_practice::kiosk_practice_two {
     }
 
 
+    // wrapper for the prediction to keep it in the kiosk
     struct PredictionWrapper has key {
         id: UID, 
         prediction: Prediction,
     }
 
-
-   struct Prediction has key, store {
+    // the prediction struct
+    struct Prediction has key, store {
         id: UID,
         image_url: String,
         demo: Option<String>,
@@ -49,7 +50,7 @@ module kiosk_practice::kiosk_practice_two {
     }
 
 
-
+    // init to make the transfer policy a shared object
     fun init(otw: KIOSK_PRACTICE_TWO, ctx: &mut TxContext) {
         let publisher = package::claim(otw, ctx);
 
@@ -62,7 +63,7 @@ module kiosk_practice::kiosk_practice_two {
         transfer::public_share_object(transfer_policy);
     }
 
-
+    // mint a prediction in a prediction wrapper and emit the event
     public fun mint(demo: String, repub: String, image_url: String, ctx: &mut TxContext) : PredictionWrapper{
         event::emit(PredictionMade {
             demo_event: option::some(demo),
@@ -84,4 +85,64 @@ module kiosk_practice::kiosk_practice_two {
     }
 
 
+
+    //TESTS
+    // test the prediction kiosk
+    #[test_only]
+    fun test_prediction_kiosk() {
+
+        use sui::test_scenario;
+        use sui::coin;
+
+
+        
+
+        let admin = @0xABC;
+        let user = @0xDEF;
+
+
+        let scenario_val = test_scenario::begin(admin);
+        let scenario = &mut scenario_val;
+        {
+            
+            
+        };
+
+       
+        test_scenario::next_tx(scenario, admin );
+        {
+
+        };
+
+
+        test_scenario::end(scenario_val);
+
+    }
+
+    // sample test using kiosk test utils
+    #[test]
+    fun test_kiok() {
+
+         use sui::kiosk_test_utils::{Self, Asset};
+
+
+        let ctx = &mut kiosk_test_utils::ctx();
+        let ( kiosk, owner_cap) = kiosk_test_utils::get_kiosk(ctx);
+
+        let old_owner = kiosk::owner(&kiosk);
+        kiosk::set_owner(&mut kiosk, &owner_cap, ctx);
+        assert!(kiosk::owner(&kiosk) == old_owner, 0);
+
+        kiosk::set_owner_custom(&mut kiosk, &owner_cap, @0x0333);
+        assert!(kiosk::owner(&kiosk) != old_owner, 0);
+        assert!(kiosk::owner(&kiosk) == @0x0333, 0);
+
+        kiosk_test_utils::return_kiosk(kiosk, owner_cap, ctx);
+    }
+
+
 }
+
+
+
+

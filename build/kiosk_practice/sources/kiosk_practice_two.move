@@ -86,15 +86,60 @@ module kiosk_practice::kiosk_practice_two {
 
 
 
+    #[test_only]
+    fun test_prediction_kiosk() {
 
-    
-
-
-
-
-
+        use sui::test_scenario;
+        use sui::coin;
 
 
+        
+
+        let admin = @0xABC;
+        let user = @0xDEF;
+
+
+        let scenario_val = test_scenario::begin(admin);
+        let scenario = &mut scenario_val;
+        {
+            
+            
+        };
+
+       
+        test_scenario::next_tx(scenario, admin );
+        {
+
+        };
+
+
+        test_scenario::end(scenario_val);
+
+    }
+
+    #[test]
+    fun test_kiok() {
+
+         use sui::kiosk_test_utils::{Self, Asset};
+
+
+        let ctx = &mut kiosk_test_utils::ctx();
+        let ( kiosk, owner_cap) = kiosk_test_utils::get_kiosk(ctx);
+
+        let old_owner = kiosk::owner(&kiosk);
+        kiosk::set_owner(&mut kiosk, &owner_cap, ctx);
+        assert!(kiosk::owner(&kiosk) == old_owner, 0);
+
+        kiosk::set_owner_custom(&mut kiosk, &owner_cap, @0x0333);
+        assert!(kiosk::owner(&kiosk) != old_owner, 0);
+        assert!(kiosk::owner(&kiosk) == @0x0333, 0);
+
+        kiosk_test_utils::return_kiosk(kiosk, owner_cap, ctx);
+    }
 
 
 }
+
+
+
+
