@@ -1,7 +1,7 @@
 module kiosk_practice::kiosk_practice_two {
 
 
-    use sui::kiosk;
+    use sui::kiosk::{Self, Kiosk, KioskOwnerCap};
     use sui::object::{Self, UID, ID};
     use sui::transfer;
     use sui::transfer_policy::{Self as tp, TransferPolicy};
@@ -29,6 +29,8 @@ module kiosk_practice::kiosk_practice_two {
     struct KIOSK_PRACTICE_TWO has drop {}
     
 
+
+
     // game owner cap
     struct GameOwnerCap has key {
         id: UID,
@@ -55,6 +57,14 @@ module kiosk_practice::kiosk_practice_two {
         
         
     }
+
+
+
+    // registry for transfer policy
+    struct Registry has key {
+        id: UID, 
+        tp: TransferPolicy<Prediction>,
+    }
     
     
 
@@ -76,6 +86,7 @@ module kiosk_practice::kiosk_practice_two {
     }
 
 
+
     // the prediction struct
     struct Prediction has key, store {
         id: UID,
@@ -87,7 +98,9 @@ module kiosk_practice::kiosk_practice_two {
 
 
 
-    // init to make the transfer policy a shared object
+
+    // init to make the transfer policy a shared object 
+    // and transfer the game owner cap to the sender
     fun init(otw: KIOSK_PRACTICE_TWO, ctx: &mut TxContext) {
         let publisher = package::claim(otw, ctx);
 
@@ -102,7 +115,10 @@ module kiosk_practice::kiosk_practice_two {
         transfer::transfer(GameOwnerCap {
             id: object::new(ctx),
         }, tx_context::sender(ctx));
+
     }
+
+
 
 
     // create a new game and instance
@@ -131,8 +147,12 @@ module kiosk_practice::kiosk_practice_two {
 
 
 
+
+
+
+
     // mint a prediction in a prediction wrapper and emit the event
-    public fun mint(demo: String, repub: String, image_url: String, ctx: &mut TxContext) : PredictionWrapper{
+    public fun make_prediction(demo: String, repub: String, image_url: String, ctx: &mut TxContext) : PredictionWrapper{
         event::emit(PredictionMade {
             demo_event: option::some(demo),
             repub_event: option::some(repub),
@@ -151,6 +171,32 @@ module kiosk_practice::kiosk_practice_two {
             prediction
         }
     }
+
+
+
+    public fun unwrap(
+
+        prediction_wrapper: PredictionWrapper, 
+        kiosk: &mut Kiosk, 
+        kiosk_cap: &KioskOwnerCap, 
+        _tp: &TransferPolicy<Prediction>
+        ) 
+        {
+
+        let PredictionWrapper { id, prediction } = prediction_wrapper;
+
+
+        object::delete(id);
+        kiosk::lock(kiosk, kiosk_cap, _tp, prediction);
+    }
+
+
+
+
+
+
+
+
 
 
 

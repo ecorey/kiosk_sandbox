@@ -1,7 +1,7 @@
 module kiosk_practice::kiosk_practice_two {
 
 
-    use sui::kiosk;
+    use sui::kiosk::{Self, Kiosk, KioskOwnerCap};
     use sui::object::{Self, UID, ID};
     use sui::transfer;
     use sui::transfer_policy::{Self as tp, TransferPolicy};
@@ -56,6 +56,14 @@ module kiosk_practice::kiosk_practice_two {
         pick2: Table<u64, address >,
         
         
+    }
+
+
+
+    // registry for transfer policy
+    struct Registry has key {
+        id: UID, 
+        tp: TransferPolicy<Prediction>,
     }
     
     
@@ -166,7 +174,21 @@ module kiosk_practice::kiosk_practice_two {
 
 
 
+    public fun unwrap(
 
+        prediction_wrapper: PredictionWrapper, 
+        kiosk: &mut Kiosk, 
+        kiosk_cap: &KioskOwnerCap, 
+        _tp: &TransferPolicy<Prediction>
+        ) 
+        {
+
+        let PredictionWrapper { id, prediction } = prediction_wrapper;
+
+
+        object::delete(id);
+        kiosk::lock(kiosk, kiosk_cap, _tp, prediction);
+    }
 
 
 
