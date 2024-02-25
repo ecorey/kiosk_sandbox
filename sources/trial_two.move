@@ -2,7 +2,7 @@ module kiosk_practice::kiosk_practice_two {
 
 
     use sui::kiosk;
-    use sui::object::{Self, UID};
+    use sui::object::{Self, UID, ID};
     use sui::transfer;
     use sui::transfer_policy::{Self as tp, TransferPolicy};
     use sui::tx_context::{TxContext, Self};
@@ -11,6 +11,10 @@ module kiosk_practice::kiosk_practice_two {
     use sui::display::{Self, Display};
     use std::option::{Self, Option};
     use sui::event;
+    use sui::balance::{Self, Balance};
+    use sui::sui::SUI;
+    use sui::table::Table;
+
 
 
 
@@ -23,6 +27,38 @@ module kiosk_practice::kiosk_practice_two {
 
     // OTW for the kiosk init function
     struct KIOSK_PRACTICE_TWO has drop {}
+    
+
+
+
+    // game owner cap
+    struct GameOwnerCap has key {
+        id: UID,
+    }
+
+
+    // game
+    struct Game has key, store {
+        id: UID,
+        coin: String,
+        balance: Balance<SUI>,
+        price: u64,
+        prev_id: Option<ID>,    
+        cur_id: ID,
+
+    }
+
+
+    struct GameInstance has key, store {
+        id: UID,
+        balance: Balance<SUI>,
+        pick1: Table<u64, address >,
+        pick2: Table<u64, address >,
+        
+        
+    }
+    
+    
 
 
     // event emitted when a prediction is made
@@ -34,11 +70,14 @@ module kiosk_practice::kiosk_practice_two {
     }
 
 
+
     // wrapper for the prediction to keep it in the kiosk
     struct PredictionWrapper has key {
         id: UID, 
         prediction: Prediction,
     }
+
+
 
     // the prediction struct
     struct Prediction has key, store {
@@ -50,7 +89,10 @@ module kiosk_practice::kiosk_practice_two {
     }
 
 
-    // init to make the transfer policy a shared object
+
+
+    // init to make the transfer policy a shared object 
+    // and transfer the game owner cap to the sender
     fun init(otw: KIOSK_PRACTICE_TWO, ctx: &mut TxContext) {
         let publisher = package::claim(otw, ctx);
 
@@ -61,10 +103,48 @@ module kiosk_practice::kiosk_practice_two {
         transfer::public_transfer(tp_cap, tx_context::sender(ctx));
 
         transfer::public_share_object(transfer_policy);
+
+        transfer::transfer(GameOwnerCap {
+            id: object::new(ctx),
+        }, tx_context::sender(ctx));
+
     }
 
+
+
+
+    // create a new game and instance
+    // #[allow(lint(share_owned))]
+    // public fun new(_: &GameOwnerCap, coin: String, price: u64, ctx: &mut TxContext)  {
+    //    let instance = new_instance(ctx);
+    //    let game = new_game(&instance, coin, price, ctx);
+
+
+    //    transfer::share_object(game);
+    //    transfer::share_object(instance);
+    // }
+
+
+
+    // create a new game
+    public fun new_game() {
+
+    }
+
+
+    // new instance
+    fun new_instance() {
+
+    }
+
+
+
+
+
+
+
     // mint a prediction in a prediction wrapper and emit the event
-    public fun mint(demo: String, repub: String, image_url: String, ctx: &mut TxContext) : PredictionWrapper{
+    public fun make_prediction(demo: String, repub: String, image_url: String, ctx: &mut TxContext) : PredictionWrapper{
         event::emit(PredictionMade {
             demo_event: option::some(demo),
             repub_event: option::some(repub),
@@ -83,6 +163,18 @@ module kiosk_practice::kiosk_practice_two {
             prediction
         }
     }
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
