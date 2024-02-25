@@ -275,7 +275,7 @@ module kiosk_practice::kiosk_practice_two {
 
 
 // TODO
-// add transfer policy rules and fix the empty_policy function
+// add transfer policy rules and create the empty_policy function
 // add consts, asserts, and tests
 // add game elements (new, instance, finalize, ext.)
 // add table to store the prediction with an address
