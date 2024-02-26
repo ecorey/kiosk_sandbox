@@ -99,6 +99,8 @@ module kiosk_practice::kiosk_practice_two {
 
 
 
+
+
     // init to make the transfer policy a shared object 
     // and transfer the game owner cap to the sender
     fun init(otw: KIOSK_PRACTICE_TWO, ctx: &mut TxContext) {
@@ -275,7 +277,10 @@ module kiosk_practice::kiosk_practice_two {
 
 
 // TODO
-// add central kiosk that sender can withdraw from
+// vector to hold values
+// only need one value as a + b = 538
+// add timestamp to the prediction
+// create game_data struct that is a shared object and holds vector of predictions
 // add transfer policy rules and create the empty_policy function
 // add consts, asserts, and tests
 // add game elements (new, instance, finalize, ext.)
