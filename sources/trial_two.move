@@ -22,7 +22,7 @@ module kiosk_practice::kiosk_practice_two {
 
 
     // errors
-    
+    const EOutsideWindow: u64 = 0;
 
 
     // OTW for the kiosk init function
@@ -37,6 +37,13 @@ module kiosk_practice::kiosk_practice_two {
     }
 
 
+    struct Epoch has store {
+       start_time: u64,
+       end_time: u64,
+
+    }
+
+
     // game
     struct Game has key, store {
         id: UID,
@@ -45,9 +52,18 @@ module kiosk_practice::kiosk_practice_two {
         price: u64,
         prev_id: Option<ID>,    
         cur_id: ID,
+        result: u64,
+        predict_epoch: Epoch,
+        report_epoch: Epoch,
+        
 
     }
 
+    // report winner within timeframe by ref , add event
+    public fun report_winner(prediction: &Prediction, game: &mut Game, clock: &Clock ) {
+        assert!(clock::timestamp_ms(clock) > game.predict_epoch.start_time, EOutsideWindow);
+        assert!(clock::timestamp_ms(clock) < game.predict_epoch.end_time, EOutsideWindow);
+    } 
 
     struct GameInstance has key, store {
         id: UID,
@@ -91,8 +107,8 @@ module kiosk_practice::kiosk_practice_two {
     struct Prediction has key, store {
         id: UID,
         image_url: String,
-        demo: Option<String>,
-        repub: Option<String>,
+        prediction: u64,
+        timestamp: u64,
         
     }
 
@@ -215,7 +231,6 @@ module kiosk_practice::kiosk_practice_two {
 
 
 
-
     //TESTS
     // test the prediction kiosk
     #[test_only]
@@ -277,6 +292,16 @@ module kiosk_practice::kiosk_practice_two {
 
 
 // TODO
+
+
+ 
+// user gets predictin with timeline and winenr claims within a timeperiod 
+
+// dont use shared object let user claim
+
+// time windows 
+
+
 // vector to hold values
 // only need one value as a + b = 538
 // add timestamp to the prediction
