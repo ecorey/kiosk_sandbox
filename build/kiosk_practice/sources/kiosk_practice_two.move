@@ -15,6 +15,7 @@ module kiosk_practice::kiosk_practice_two {
     use sui::sui::SUI;
     use sui::table::Table;
     use sui::coin::{Self, Coin};    
+    use sui::clock::{Self, Clock};
 
 
 
@@ -22,8 +23,7 @@ module kiosk_practice::kiosk_practice_two {
 
 
     // errors
-    const ENotOneTimeWitness: u64 = 0;
-    const ETypeNotFromModule: u64 = 1;
+    const EOutsideWindow: u64 = 0;
 
 
     // OTW for the kiosk init function
@@ -38,6 +38,13 @@ module kiosk_practice::kiosk_practice_two {
     }
 
 
+    struct Epoch has store {
+       start_time: u64,
+       end_time: u64,
+
+    }
+
+
     // game
     struct Game has key, store {
         id: UID,
@@ -46,16 +53,25 @@ module kiosk_practice::kiosk_practice_two {
         price: u64,
         prev_id: Option<ID>,    
         cur_id: ID,
+        result: u64,
+        predict_epoch: Epoch,
+        report_epoch: Epoch,
+        
 
     }
+
+    // report winner within timeframe by ref , add event
+    public fun report_winner(prediction: &Prediction, game: &mut Game, clock: &Clock ) {
+        assert!(clock::timestamp_ms(clock) > game.predict_epoch.start_time, EOutsideWindow);
+        assert!(clock::timestamp_ms(clock) < game.predict_epoch.end_time, EOutsideWindow);
+    } 
+
 
 
     struct GameInstance has key, store {
         id: UID,
+        game_id: ID,
         balance: Balance<SUI>,
-        pick1: Table<u64, address >,
-        pick2: Table<u64, address >,
-        
         
     }
 
@@ -72,9 +88,9 @@ module kiosk_practice::kiosk_practice_two {
 
     // event emitted when a prediction is made
     // add ID to the event to connect to the prediction
+    // user only needs to predict the repub and dem can be caluculated from the total count
     struct PredictionMade has copy, drop {
-        demo_event: Option<String>,
-        repub_event: Option<String>,
+        prediction: Option<u64>,
         made_by: address,
     }
 
@@ -92,10 +108,12 @@ module kiosk_practice::kiosk_practice_two {
     struct Prediction has key, store {
         id: UID,
         image_url: String,
-        demo: Option<String>,
-        repub: Option<String>,
+        prediction: Option<u64>,
+        // timestamp: u64,
         
     }
+
+
 
 
 
@@ -122,18 +140,12 @@ module kiosk_practice::kiosk_practice_two {
 
 
 
-    // create a new game and instance
-    #[allow(lint(share_owned))]
-    public fun new()  {
-    
-    }
-
-
 
     // create a new game
     public fun new_game() {
 
     }
+
 
 
     // new instance
@@ -148,18 +160,19 @@ module kiosk_practice::kiosk_practice_two {
 
 
     // mint a prediction in a prediction wrapper and emit the event
-    public fun make_prediction(demo: String, repub: String, image_url: String, ctx: &mut TxContext) : PredictionWrapper{
+    public fun make_prediction(predict: u64, image_url: String, ctx: &mut TxContext) : PredictionWrapper{
         event::emit(PredictionMade {
-            demo_event: option::some(demo),
-            repub_event: option::some(repub),
+            prediction: option::some(predict),
             made_by: tx_context::sender(ctx),
         });
+
+        // let clock = clock::create(ctx);
 
         let prediction = Prediction {
             id: object::new(ctx),
             image_url,
-            demo: option::some(demo),
-            repub: option::some(repub),
+            prediction: option::some(predict),
+            // timestamp: clock::timestamp_ms(&clock),
         };
 
         PredictionWrapper {
@@ -191,21 +204,11 @@ module kiosk_practice::kiosk_practice_two {
 
     // creates an empty transfer policy and publicly shares it
     // todo create rules for the transfer policy / add royalty rule and floor rule
-    // public fun create_empty_policy( publisher: &Publisher, ctx: &mut TxContext) {
+    public fun create_empty_policy( publisher: &Publisher, ctx: &mut TxContext) {
 
-    //     let (transfer_policy, tp_cap) = tp::new<Prediction>(publisher, ctx);
-        
-        
-    //     let registry = Registry {
-    //         id: object::new(ctx),
-    //         tp: transfer_policy,
-    //     };
+       
 
-
-    //     transfer::public_transfer(tp_cap, tx_context::sender(ctx));
-    //     transfer::public_share_object(transfer_policy);
-
-    // }
+    }
 
 
 
@@ -217,7 +220,7 @@ module kiosk_practice::kiosk_practice_two {
         let ( prediction, transfer_request)  = kiosk::purchase_with_cap<Prediction>(kiosk, purchase_cap, coin::zero<SUI>(ctx));
         confirm_request<Prediction>( &registry.tp, transfer_request  );
 
-        let Prediction {id, image_url: _, demo: _, repub: _} = prediction;
+        let Prediction {id, image_url: _, prediction: _, } = prediction;
         object::delete(id);
 
     }
@@ -225,8 +228,7 @@ module kiosk_practice::kiosk_practice_two {
 
 
 
-
-
+ 
 
 
 
@@ -264,6 +266,7 @@ module kiosk_practice::kiosk_practice_two {
 
     }
 
+
     // sample test using kiosk test utils
     #[test]
     fun test_kiok() {
@@ -287,6 +290,42 @@ module kiosk_practice::kiosk_practice_two {
 
 
 }
+
+
+
+// TODO
+
+
+ 
+// user gets predictin with timeline and winenr claims within a timeperiod 
+
+// dont use shared object let user claim
+
+// time windows 
+
+
+// vector to hold values
+// only need one value as a + b = 538
+// add timestamp to the prediction
+// create game_data struct that is a shared object and holds vector of predictions
+// add transfer policy rules and create the empty_policy function
+// add consts, asserts, and tests
+// add game elements (new, instance, finalize, ext.)
+// add table to store the predictions with an address
+// add switchboard oracle prototype
+// ptb for making predictions
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
