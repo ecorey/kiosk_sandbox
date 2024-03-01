@@ -235,59 +235,33 @@ module kiosk_practice::kiosk_practice_two {
 
     //TESTS
     // test the prediction kiosk
-    #[test_only]
-    fun test_prediction_kiosk() {
+    #[test_only] use sui::test_scenario;
+    
 
-        use sui::test_scenario;
-        use sui::coin;
-
-
-        
-
-        let admin = @0xABC;
-        let user = @0xDEF;
-
-
-        let scenario_val = test_scenario::begin(admin);
-        let scenario = &mut scenario_val;
-        {
-            
-            
-        };
-
-       
-        test_scenario::next_tx(scenario, admin );
-        {
-
-        };
-
-
-        test_scenario::end(scenario_val);
-
-    }
-
-
-    // sample test using kiosk test utils
     #[test]
-    fun test_kiok() {
+    public fun test_init() {
 
-         use sui::kiosk_test_utils::{Self, Asset};
+        let admin = @0x1;
+        let scenario = test_scenario::begin(admin);
+        let scenario_val = &mut scenario;
+
+        let otw = KIOSK_PRACTICE_TWO {};
 
 
-        let ctx = &mut kiosk_test_utils::ctx();
-        let ( kiosk, owner_cap) = kiosk_test_utils::get_kiosk(ctx);
+        {
+            // `test_scenario::ctx` returns the `TxContext`
+            let ctx = test_scenario::ctx(&mut scenario);
+            init(otw, ctx);
+        };
 
-        let old_owner = kiosk::owner(&kiosk);
-        kiosk::set_owner(&mut kiosk, &owner_cap, ctx);
-        assert!(kiosk::owner(&kiosk) == old_owner, 0);
 
-        kiosk::set_owner_custom(&mut kiosk, &owner_cap, @0x0333);
-        assert!(kiosk::owner(&kiosk) != old_owner, 0);
-        assert!(kiosk::owner(&kiosk) == @0x0333, 0);
 
-        kiosk_test_utils::return_kiosk(kiosk, owner_cap, ctx);
+
+        test_scenario::end(scenario);   
+
     }
 
+   
 
 }
 
