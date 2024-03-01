@@ -109,7 +109,7 @@ module kiosk_practice::kiosk_practice_two {
         id: UID,
         image_url: String,
         prediction: Option<u64>,
-        // timestamp: u64,
+        timestamp: u64,
         
     }
 
@@ -160,19 +160,19 @@ module kiosk_practice::kiosk_practice_two {
 
 
     // mint a prediction in a prediction wrapper and emit the event
-    public fun make_prediction(predict: u64, image_url: String, ctx: &mut TxContext) : PredictionWrapper{
+    public fun make_prediction(predict: u64, image_url: String, clock: &Clock, ctx: &mut TxContext) : PredictionWrapper{
         event::emit(PredictionMade {
             prediction: option::some(predict),
             made_by: tx_context::sender(ctx),
         });
 
-        // let clock = clock::create(ctx);
+        
 
         let prediction = Prediction {
             id: object::new(ctx),
             image_url,
             prediction: option::some(predict),
-            // timestamp: clock::timestamp_ms(&clock),
+            timestamp: clock::timestamp_ms(clock),
         };
 
         PredictionWrapper {
@@ -220,7 +220,7 @@ module kiosk_practice::kiosk_practice_two {
         let ( prediction, transfer_request)  = kiosk::purchase_with_cap<Prediction>(kiosk, purchase_cap, coin::zero<SUI>(ctx));
         confirm_request<Prediction>( &registry.tp, transfer_request  );
 
-        let Prediction {id, image_url: _, prediction: _, } = prediction;
+        let Prediction {id, image_url: _, prediction: _, timestamp: _} = prediction;
         object::delete(id);
 
     }
