@@ -181,6 +181,7 @@ module kiosk_practice::kiosk_practice_two {
 
         let (kiosk, kiosk_owner_cap) = kiosk::new(ctx);
 
+
         // place and lock item into the kiosk
         kiosk::lock(&mut kiosk, &kiosk_owner_cap, _tp, prediction);
        
@@ -195,25 +196,21 @@ module kiosk_practice::kiosk_practice_two {
         }
 
 
-
-
     }
 
 
 
-    // unwraps prediction and locks the kiosk
-    // public fun unwrap(
-    //     prediction_wrapper: PredictionWrapper, 
-    //     ctx: &mut TxContext
-    // ) {
-    //     let PredictionWrapper { id, prediction, kiosk, kiosk_owner_cap} = prediction_wrapper;
-
+    // unwraps prediction and returns the kiosk and kiosk owner cap
+    public fun unwrap(
+        prediction_wrapper: PredictionWrapper, 
+        ctx: &mut TxContext
+    ) : (Kiosk, KioskOwnerCap) {
+        let PredictionWrapper { id, kiosk, kiosk_owner_cap} = prediction_wrapper;
         
-    //     kiosk::lock(&mut kiosk, &kiosk_owner_cap, &_tp, &prediction);
+        object::delete(id); 
 
-        
-    //     object::delete(id); 
-    // }
+        (kiosk, kiosk_owner_cap)
+    }
 
 
 
@@ -229,21 +226,29 @@ module kiosk_practice::kiosk_practice_two {
 
 
 
-    public fun burn_from_kiosk( kiosk: &mut Kiosk, kiosk_cap: &KioskOwnerCap, prediction_id: ID, registry: &mut Registry, ctx: &mut TxContext) {
+    // public fun burn_from_kiosk( kiosk: &mut Kiosk, kiosk_cap: &KioskOwnerCap, prediction_id: ID, registry: &mut Registry, ctx: &mut TxContext) {
 
-        let purchase_cap = kiosk::list_with_purchase_cap<Prediction>( kiosk, kiosk_cap, prediction_id, 0, ctx); 
-        let ( prediction, transfer_request)  = kiosk::purchase_with_cap<Prediction>(kiosk, purchase_cap, coin::zero<SUI>(ctx));
-        confirm_request<Prediction>( &registry.tp, transfer_request  );
+        // let purchase_cap = kiosk::list_with_purchase_cap<Prediction>( kiosk, kiosk_cap, prediction_id, 0, ctx); 
+        // let ( prediction, transfer_request)  = kiosk::purchase_with_cap<Prediction>(kiosk, purchase_cap, coin::zero<SUI>(ctx));
+        // confirm_request<Prediction>( &registry.tp, transfer_request  );
 
-        let Prediction {id, prediction: _, timestamp: _} = prediction;
-        object::delete(id);
+        // let Prediction {id, prediction: _, timestamp: _} = prediction;
+        // object::delete(id);
 
+    // }
+
+
+
+
+    public fun list_prediction<T: key + store>(
+        kiosk: &mut Kiosk, 
+        kiosk_cap: &KioskOwnerCap, 
+        prediction_id: ID, 
+        price: u64
+    ) {
+        kiosk::list<Prediction>(kiosk, kiosk_cap, prediction_id, price);
     }
 
-
-
-
- 
 
 
 
