@@ -251,6 +251,13 @@ module kiosk_practice::kiosk_practice_two {
 
 
 
+    public fun delist_prediction<T: key + store>(
+        kiosk: &mut Kiosk,
+        kiosk_cap: &KioskOwnerCap,
+        prediction_id: ID,
+    ) {
+        kiosk::delist<Prediction>(kiosk, kiosk_cap, prediction_id);
+    }
 
 
     //TESTS
