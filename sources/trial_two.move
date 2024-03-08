@@ -96,13 +96,6 @@ module kiosk_practice::kiosk_practice_two {
 
 
 
-    // wrapper for the prediction to keep it in the kiosk
-    struct PredictionWrapper has key {
-        id: UID, 
-        kiosk: Kiosk,
-        kiosk_owner_cap: KioskOwnerCap,
-        // prediction: Prediction,
-    }
 
 
 
@@ -156,12 +149,17 @@ module kiosk_practice::kiosk_practice_two {
 
 
 
+    // creates a kiosk that holds the prediction
+    public fun create_kiosk(ctx: &mut TxContext) : (Kiosk, KioskOwnerCap) {
+        let (kiosk, kiosk_owner_cap) = kiosk::new(ctx);
+        (kiosk, kiosk_owner_cap)
+    }
 
 
 
 
-    // mint a prediction in a prediction wrapper and emit the event
-    public fun make_prediction(predict: u64, clock: &Clock, _tp: &TransferPolicy<Prediction> , ctx: &mut TxContext) : PredictionWrapper{
+    // mint a prediction and locks it in teh users kiosk and emits the event
+    public fun make_prediction(kiosk: &mut Kiosk, kiosk_owner_cap: &KioskOwnerCap, predict: u64, clock: &Clock, _tp: &TransferPolicy<Prediction>, ctx: &mut TxContext)  {
         
         
         event::emit(PredictionMade {
@@ -170,7 +168,6 @@ module kiosk_practice::kiosk_practice_two {
         });
 
         
-
         let prediction = Prediction {
             id: object::new(ctx),
             prediction: option::some(predict),
@@ -178,38 +175,11 @@ module kiosk_practice::kiosk_practice_two {
         };
 
 
-
-        let (kiosk, kiosk_owner_cap) = kiosk::new(ctx);
-
-
         // place and lock item into the kiosk
-        kiosk::lock(&mut kiosk, &kiosk_owner_cap, _tp, prediction);
+        kiosk::lock(kiosk, kiosk_owner_cap, _tp, prediction);
        
 
-        // wrapper is retuned to the user with the item locked in the kiosk
-        // the prediction is not included in the prediction wrapper becasue its locked in teh kiosk
-        PredictionWrapper {
-            id: object::new(ctx),
-            kiosk: kiosk,
-            kiosk_owner_cap: kiosk_owner_cap,
-            
-        }
-
-
-    }
-
-
-
-    // unwraps prediction and returns the kiosk and kiosk owner cap
-    public fun unwrap(
-        prediction_wrapper: PredictionWrapper, 
-        ctx: &mut TxContext
-    ) : (Kiosk, KioskOwnerCap) {
-        let PredictionWrapper { id, kiosk, kiosk_owner_cap} = prediction_wrapper;
         
-        object::delete(id); 
-
-        (kiosk, kiosk_owner_cap)
     }
 
 
@@ -221,7 +191,6 @@ module kiosk_practice::kiosk_practice_two {
        
 
     }
-
 
 
 
@@ -258,6 +227,12 @@ module kiosk_practice::kiosk_practice_two {
     ) {
         kiosk::delist<Prediction>(kiosk, kiosk_cap, prediction_id);
     }
+
+
+
+
+
+
 
 
     //TESTS
