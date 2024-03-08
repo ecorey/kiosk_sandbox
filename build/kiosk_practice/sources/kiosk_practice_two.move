@@ -101,7 +101,7 @@ module kiosk_practice::kiosk_practice_two {
         id: UID, 
         kiosk: Kiosk,
         kiosk_owner_cap: KioskOwnerCap,
-        prediction: Prediction,
+        // prediction: Prediction,
     }
 
 
@@ -161,7 +161,7 @@ module kiosk_practice::kiosk_practice_two {
 
 
     // mint a prediction in a prediction wrapper and emit the event
-    public fun make_prediction(predict: u64, clock: &Clock, ctx: &mut TxContext) : PredictionWrapper{
+    public fun make_prediction(predict: u64, clock: &Clock, _tp: &TransferPolicy<Prediction> , ctx: &mut TxContext) : PredictionWrapper{
         
         
         event::emit(PredictionMade {
@@ -181,14 +181,17 @@ module kiosk_practice::kiosk_practice_two {
 
         let (kiosk, kiosk_owner_cap) = kiosk::new(ctx);
 
+        // place and lock item into the kiosk
+        kiosk::lock(&mut kiosk, &kiosk_owner_cap, _tp, prediction);
        
 
-
+        // wrapper is retuned to the user with the item locked in the kiosk
+        // the prediction is not included in the prediction wrapper becasue its locked in teh kiosk
         PredictionWrapper {
             id: object::new(ctx),
             kiosk: kiosk,
             kiosk_owner_cap: kiosk_owner_cap,
-            prediction
+            
         }
 
 
