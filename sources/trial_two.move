@@ -317,7 +317,7 @@ module kiosk_practice::kiosk_practice_two {
             let (kiosk, kiosk_owner_cap) = test::get_kiosk(test_scenario::ctx(scenario_val));
             
             
-            // let (transfer_policy, transfer_policy_cap) = get_policy(test_scenario::ctx(scenario_val));
+            let (transfer_policy, transfer_policy_cap) = test::get_policy(test_scenario::ctx(scenario_val));
 
            
             // make_prediction(kiosk, kiosk_owner_cap, guess, &clock, transfer_policy , test_scenario::ctx(scenario_val));
@@ -326,7 +326,7 @@ module kiosk_practice::kiosk_practice_two {
 
             // burn_from_kiosk( kiosk, kiosk_owner_cap, prediction_id, registry, test_scenario::ctx(scenario_val));
 
-            // test::return_policy(transfer_policy<Prediction>, transfer_policy_cap<Prediction>, test_scenario::ctx(scenario_val));
+            test::return_policy(transfer_policy, transfer_policy_cap, test_scenario::ctx(scenario_val));
             
             test::return_kiosk(kiosk, kiosk_owner_cap, test_scenario::ctx(scenario_val));
            

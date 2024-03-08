@@ -5,14 +5,14 @@ compiled_package_info:
     kiosk_practice: "0000000000000000000000000000000000000000000000000000000000000000"
     std: "0000000000000000000000000000000000000000000000000000000000000001"
     sui: "0000000000000000000000000000000000000000000000000000000000000002"
-  source_digest: 7A6F52E6F94FA81CAB5C080C469323FCC5C2F3F15A712DF3A5CA2F6C8ECAAC2C
+  source_digest: 0BEA85822FADE6E3EF70CA5E2B453F7D8140516242DA981A77DC583EBC70C672
   build_flags:
-    dev_mode: false
-    test_mode: false
+    dev_mode: true
+    test_mode: true
     generate_docs: false
     install_dir: ~
     force_recompilation: false
-    lock_file: "./Move.lock"
+    lock_file: ~
     fetch_deps_only: false
     skip_fetch_latest_git_deps: false
     default_flavor: sui
