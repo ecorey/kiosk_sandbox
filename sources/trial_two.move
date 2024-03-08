@@ -181,6 +181,7 @@ module kiosk_practice::kiosk_practice_two {
 
         let (kiosk, kiosk_owner_cap) = kiosk::new(ctx);
 
+        // place and lock item into the kiosk
        
 
 
