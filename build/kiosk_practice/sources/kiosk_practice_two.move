@@ -4,7 +4,7 @@ module kiosk_practice::kiosk_practice_two {
     use sui::kiosk::{Self, Kiosk, KioskOwnerCap};
     use sui::object::{Self, UID, ID};
     use sui::transfer;
-    use sui::transfer_policy::{Self as tp, TransferPolicy, confirm_request};
+    use sui::transfer_policy::{Self as tp, TransferPolicy, TransferRequest,confirm_request};
     use sui::tx_context::{TxContext, Self};
     use sui::package::{Self, Publisher};    
     use std::string::{String};
@@ -16,6 +16,7 @@ module kiosk_practice::kiosk_practice_two {
     use sui::table::Table;
     use sui::coin::{Self, Coin};    
     use sui::clock::{Self, Clock};
+    
 
 
 
@@ -176,6 +177,7 @@ module kiosk_practice::kiosk_practice_two {
 
 
         // place and lock item into the kiosk
+        // need to adjust because cannot list / delist if teh prediction is locked needs to be placed
         kiosk::lock(kiosk, kiosk_owner_cap, _tp, prediction);
        
 
@@ -195,16 +197,16 @@ module kiosk_practice::kiosk_practice_two {
 
 
 
-    // public fun burn_from_kiosk( kiosk: &mut Kiosk, kiosk_cap: &KioskOwnerCap, prediction_id: ID, registry: &mut Registry, ctx: &mut TxContext) {
+    public fun burn_from_kiosk( kiosk: &mut Kiosk, kiosk_cap: &KioskOwnerCap, prediction_id: ID, registry: &mut Registry, ctx: &mut TxContext) {
 
-        // let purchase_cap = kiosk::list_with_purchase_cap<Prediction>( kiosk, kiosk_cap, prediction_id, 0, ctx); 
-        // let ( prediction, transfer_request)  = kiosk::purchase_with_cap<Prediction>(kiosk, purchase_cap, coin::zero<SUI>(ctx));
-        // confirm_request<Prediction>( &registry.tp, transfer_request  );
+        let purchase_cap = kiosk::list_with_purchase_cap<Prediction>( kiosk, kiosk_cap, prediction_id, 0, ctx); 
+        let ( prediction, transfer_request)  = kiosk::purchase_with_cap<Prediction>(kiosk, purchase_cap, coin::zero<SUI>(ctx));
+        confirm_request<Prediction>( &registry.tp, transfer_request  );
 
-        // let Prediction {id, prediction: _, timestamp: _} = prediction;
-        // object::delete(id);
+        let Prediction {id, prediction: _, timestamp: _} = prediction;
+        object::delete(id);
 
-    // }
+    }
 
 
 
@@ -230,7 +232,18 @@ module kiosk_practice::kiosk_practice_two {
 
 
 
+    // purchase the prediction from the kiosk
+    public fun purchase_prediction<T: key + store>(
+        kiosk: &mut Kiosk,
+        prediction_id: ID,
+        payment: Coin<SUI>
+        
+    ) : (Prediction, TransferRequest<Prediction>) {
 
+
+        kiosk::purchase<Prediction>(kiosk, prediction_id, payment)
+
+    }
 
 
 
