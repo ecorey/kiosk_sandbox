@@ -17,6 +17,7 @@ module kiosk_practice::kiosk_practice_two {
     use sui::coin::{Self, Coin};    
     use sui::clock::{Self, Clock};
     
+    
 
 
 
@@ -266,6 +267,15 @@ module kiosk_practice::kiosk_practice_two {
     }
 
 
+    // clean up functions
+    public fun return_policy(policy: TransferPolicy<Prediction>, cap: TransferPolicyCap<Prediction>, ctx: &mut TxContext) : Coin<SUI> {
+        let profits = tp::destroy_and_withdraw(policy, cap, ctx);
+        profits
+        
+    }
+
+
+    
 
 
     //TESTS
@@ -284,7 +294,7 @@ module kiosk_practice::kiosk_practice_two {
 
         let otw = KIOSK_PRACTICE_TWO {};
 
-
+        // test the init function
         {
             
             init(otw, test_scenario::ctx(scenario_val));
@@ -292,8 +302,8 @@ module kiosk_practice::kiosk_practice_two {
             
         };
 
-
-         test_scenario::next_tx(scenario_val, admin);
+        // test the sender has the game owner cap 
+        test_scenario::next_tx(scenario_val, admin);
         {
             
             let ctx = test_scenario::ctx(scenario_val);
@@ -306,28 +316,40 @@ module kiosk_practice::kiosk_practice_two {
         };
 
 
-
+        // test making a prediction
+        // TODO
+        // fix the transfer policy in the test then test for the prediction
         test_scenario::next_tx(scenario_val, admin);
         {
-            
+            // setup
             let guess = 444;
             let clock = clock::create_for_testing(test_scenario::ctx(scenario_val));
             
                 
             let (kiosk, kiosk_owner_cap) = test::get_kiosk(test_scenario::ctx(scenario_val));
+
+            let publisher = test::get_publisher(test_scenario::ctx(scenario_val));
+
+            // let ( transfer_policy, transfer_policy_cap) = create_transfer_policy(&publisher, test_scenario::ctx(scenario_val));
             
             
-            let (transfer_policy, transfer_policy_cap) = test::get_policy(test_scenario::ctx(scenario_val));
-
-           
-            // make_prediction(kiosk, kiosk_owner_cap, guess, &clock, transfer_policy , test_scenario::ctx(scenario_val));
-            
 
 
+            // MAKE PREDICTION AND BURN PREDICTION
+            // make_prediction(&mut kiosk, &kiosk_owner_cap, guess, &clock, &transfer_policy, test_scenario::ctx(scenario_val));
             // burn_from_kiosk( kiosk, kiosk_owner_cap, prediction_id, registry, test_scenario::ctx(scenario_val));
 
-            test::return_policy(transfer_policy, transfer_policy_cap, test_scenario::ctx(scenario_val));
+
+
+
+            // CLEANUP 
+
+            // let balance = return_policy(transfer_policy, transfer_policy_cap, test_scenario::ctx(scenario_val));
+
+            // let _amount_burned = coin::burn_for_testing(balance);
             
+            test::return_publisher(publisher);
+
             test::return_kiosk(kiosk, kiosk_owner_cap, test_scenario::ctx(scenario_val));
            
             
