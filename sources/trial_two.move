@@ -99,6 +99,8 @@ module kiosk_practice::kiosk_practice_two {
     // wrapper for the prediction to keep it in the kiosk
     struct PredictionWrapper has key {
         id: UID, 
+        kiosk: Kiosk,
+        kiosk_owner_cap: KioskOwnerCap,
         prediction: Prediction,
     }
 
@@ -107,7 +109,6 @@ module kiosk_practice::kiosk_practice_two {
     // the prediction struct
     struct Prediction has key, store {
         id: UID,
-        image_url: String,
         prediction: Option<u64>,
         timestamp: u64,
         
@@ -160,7 +161,9 @@ module kiosk_practice::kiosk_practice_two {
 
 
     // mint a prediction in a prediction wrapper and emit the event
-    public fun make_prediction(predict: u64, image_url: String, clock: &Clock, ctx: &mut TxContext) : PredictionWrapper{
+    public fun make_prediction(predict: u64, clock: &Clock, ctx: &mut TxContext) : PredictionWrapper{
+        
+        
         event::emit(PredictionMade {
             prediction: option::some(predict),
             made_by: tx_context::sender(ctx),
@@ -170,35 +173,44 @@ module kiosk_practice::kiosk_practice_two {
 
         let prediction = Prediction {
             id: object::new(ctx),
-            image_url,
             prediction: option::some(predict),
             timestamp: clock::timestamp_ms(clock),
         };
 
+
+
+        let (kiosk, kiosk_owner_cap) = kiosk::new(ctx);
+
+       
+
+
         PredictionWrapper {
             id: object::new(ctx),
+            kiosk: kiosk,
+            kiosk_owner_cap: kiosk_owner_cap,
             prediction
         }
+
+
+
+
     }
 
 
 
     // unwraps prediction and locks the kiosk
-    public fun unwrap(
+    // public fun unwrap(
+    //     prediction_wrapper: PredictionWrapper, 
+    //     ctx: &mut TxContext
+    // ) {
+    //     let PredictionWrapper { id, prediction, kiosk, kiosk_owner_cap} = prediction_wrapper;
 
-        prediction_wrapper: PredictionWrapper, 
-        kiosk: &mut Kiosk, 
-        kiosk_cap: &KioskOwnerCap, 
-        _tp: &TransferPolicy<Prediction>
-        ) 
-        {
+        
+    //     kiosk::lock(&mut kiosk, &kiosk_owner_cap, &_tp, &prediction);
 
-        let PredictionWrapper { id, prediction } = prediction_wrapper;
-
-
-        object::delete(id);
-        kiosk::lock(kiosk, kiosk_cap, _tp, prediction);
-    }
+        
+    //     object::delete(id); 
+    // }
 
 
 
@@ -220,7 +232,7 @@ module kiosk_practice::kiosk_practice_two {
         let ( prediction, transfer_request)  = kiosk::purchase_with_cap<Prediction>(kiosk, purchase_cap, coin::zero<SUI>(ctx));
         confirm_request<Prediction>( &registry.tp, transfer_request  );
 
-        let Prediction {id, image_url: _, prediction: _, timestamp: _} = prediction;
+        let Prediction {id, prediction: _, timestamp: _} = prediction;
         object::delete(id);
 
     }
@@ -234,14 +246,15 @@ module kiosk_practice::kiosk_practice_two {
 
 
     //TESTS
-    // test the prediction kiosk
-    #[test_only] use sui::test_scenario;
     
-
     #[test]
     public fun test_init() {
 
+        use sui::test_scenario;
+
+
         let admin = @0x1;
+        let user1 = @0x2;
         let scenario = test_scenario::begin(admin);
         let scenario_val = &mut scenario;
 
@@ -249,19 +262,60 @@ module kiosk_practice::kiosk_practice_two {
 
 
         {
-            // `test_scenario::ctx` returns the `TxContext`
-            let ctx = test_scenario::ctx(&mut scenario);
-            init(otw, ctx);
+            
+            init(otw, test_scenario::ctx(scenario_val));
+            
+            
+        };
+
+
+         test_scenario::next_tx(scenario_val, admin);
+        {
+            
+            let ctx = test_scenario::ctx(scenario_val);
+            let sender_address = tx_context::sender(ctx);
+            assert!(sender_address == admin, 0);
+
+            let game_owner_cap = test_scenario::take_from_sender<GameOwnerCap>(scenario_val);
+            test_scenario::return_to_sender(scenario_val, game_owner_cap);
+            
         };
 
 
 
+        // test_scenario::next_tx(scenario_val, user1);
+        // {
+            
+            // let prediction = 444;
+            // let clock = clock::create_for_testing(test_scenario::ctx(scenario_val));
+            
+        
+            // let wrapper = make_prediction(prediction, &clock, test_scenario::ctx(scenario_val));
+            
+            // let kiosk: &mut Kiosk; 
+            // let kiosk_cap: &KioskOwnerCap; 
+            // let tp: &TransferPolicy<Prediction>; 
 
+        
+            // unwrap(wrapper, kiosk, kiosk_cap, tp);
+
+            // clock::destroy_for_testing(clock);
+        // };
+
+
+        
+       
+        
+        
         test_scenario::end(scenario);   
 
     }
 
    
+
+
+
+
 
 }
 
