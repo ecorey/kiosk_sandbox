@@ -274,6 +274,7 @@ module kiosk_practice::kiosk_practice_two {
     public fun test_init() {
 
         use sui::test_scenario;
+        use sui::kiosk_test_utils::{Self as test, Asset};
 
 
         let admin = @0x1;
@@ -312,26 +313,24 @@ module kiosk_practice::kiosk_practice_two {
             let guess = 444;
             let clock = clock::create_for_testing(test_scenario::ctx(scenario_val));
             
-        
-            let (kiosk, kiosk_owner_cap) = create_kiosk(test_scenario::ctx(scenario_val));
+                
+            let (kiosk, kiosk_owner_cap) = test::get_kiosk(test_scenario::ctx(scenario_val));
             
             
-            let publisher = test_scenario::take_from_sender<Publisher>(scenario_val);
-            let registry = test_scenario::take_from_sender<Registry>(scenario_val);
-            
-            
-            let (transfer_policy, transfer_policy_cap) = create_transfer_policy( publisher, test_scenario::ctx(scenario_val));
-           
-            make_prediction(kiosk, kiosk_owner_cap, guess, &clock, transfer_policy , test_scenario::ctx(scenario_val));
-            
-
-
-            burn_from_kiosk( kiosk, kiosk_owner_cap, prediction_id, registry, test_scenario::ctx(scenario_val));
-
+            // let (transfer_policy, transfer_policy_cap) = get_policy(test_scenario::ctx(scenario_val));
 
            
-            test_scenario::return_to_sender(scenario_val, publisher);
-            test_scenario::return_to_sender(scenario_val, registry);
+            // make_prediction(kiosk, kiosk_owner_cap, guess, &clock, transfer_policy , test_scenario::ctx(scenario_val));
+            
+
+
+            // burn_from_kiosk( kiosk, kiosk_owner_cap, prediction_id, registry, test_scenario::ctx(scenario_val));
+
+            // test::return_policy(transfer_policy<Prediction>, transfer_policy_cap<Prediction>, test_scenario::ctx(scenario_val));
+            
+            test::return_kiosk(kiosk, kiosk_owner_cap, test_scenario::ctx(scenario_val));
+           
+            
 
             clock::destroy_for_testing(clock);
         };
