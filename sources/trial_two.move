@@ -4,7 +4,7 @@ module kiosk_practice::kiosk_practice_two {
     use sui::kiosk::{Self, Kiosk, KioskOwnerCap};
     use sui::object::{Self, UID, ID};
     use sui::transfer;
-    use sui::transfer_policy::{Self as tp, TransferPolicy, TransferRequest,confirm_request};
+    use sui::transfer_policy::{Self as tp, TransferPolicy, TransferPolicyCap, TransferRequest, confirm_request, add_rule, new_request};
     use sui::tx_context::{TxContext, Self};
     use sui::package::{Self, Publisher};    
     use std::string::{String};
@@ -78,12 +78,6 @@ module kiosk_practice::kiosk_practice_two {
 
 
 
-    // registry for transfer policy
-    struct Registry has key {
-        id: UID, 
-        tp: TransferPolicy<Prediction>,
-    }
-    
     
 
 
@@ -97,12 +91,10 @@ module kiosk_practice::kiosk_practice_two {
 
 
 
-
-
-
     // the prediction struct
     struct Prediction has key, store {
         id: UID,
+        prediction_id: ID,
         prediction: Option<u64>,
         timestamp: u64,
         
@@ -110,6 +102,20 @@ module kiosk_practice::kiosk_practice_two {
 
 
 
+    // registry for transfer policy
+    struct Registry has key {
+        id: UID, 
+        tp: TransferPolicy<Prediction>,
+    }
+    
+
+    // struct RoyaltyRuleConfig has store, drop {
+    //     royalty_percentage: u64, 
+    // }
+
+    // struct FloorRuleConfig has store, drop {
+    //     minimum_amount: u64, 
+    // }
 
 
 
@@ -132,6 +138,24 @@ module kiosk_practice::kiosk_practice_two {
 
     }
 
+
+    // creates an transfer policy and publicly shares it
+    // todo create rules for the transfer policy / add royalty rule and floor rule
+    public fun create_transfer_policy( publisher: &Publisher, ctx: &mut TxContext) : (TransferPolicy<Prediction>, TransferPolicyCap<Prediction>) {
+
+        let (transfer_policy, transfer_policy_cap) = tp::new<Prediction>(publisher, ctx);
+       
+        // let royalty_config = RoyaltyRuleConfig { royalty_percentage: 05 }; 
+        // let floor_config = FloorRuleConfig { minimum_amount: 100 };
+
+
+        // add_rule<RoyaltyRuleConfig>(royalty_config, &mut transfer_policy, &transfer_policy_cap, royalty_config);
+        // add_rule<FloorRuleConfig>(floor_config, &mut transfer_policy, &transfer_policy_cap, floor_config);
+        
+
+        (transfer_policy, transfer_policy_cap)
+
+    }
 
 
 
@@ -168,9 +192,12 @@ module kiosk_practice::kiosk_practice_two {
             made_by: tx_context::sender(ctx),
         });
 
-        
+        let id = object::new(ctx);
+        let prediction_id = object::uid_to_inner(&id);
+
         let prediction = Prediction {
-            id: object::new(ctx),
+            id, 
+            prediction_id,
             prediction: option::some(predict),
             timestamp: clock::timestamp_ms(clock),
         };
@@ -186,14 +213,7 @@ module kiosk_practice::kiosk_practice_two {
 
 
 
-    // creates an empty transfer policy and publicly shares it
-    // todo create rules for the transfer policy / add royalty rule and floor rule
-    public fun create_empty_policy( publisher: &Publisher, ctx: &mut TxContext) {
-
-       
-
-    }
-
+    
 
 
 
@@ -203,7 +223,7 @@ module kiosk_practice::kiosk_practice_two {
         let ( prediction, transfer_request)  = kiosk::purchase_with_cap<Prediction>(kiosk, purchase_cap, coin::zero<SUI>(ctx));
         confirm_request<Prediction>( &registry.tp, transfer_request  );
 
-        let Prediction {id, prediction: _, timestamp: _} = prediction;
+        let Prediction {id, prediction_id: _, prediction: _, timestamp: _} = prediction;
         object::delete(id);
 
     }
@@ -286,24 +306,35 @@ module kiosk_practice::kiosk_practice_two {
 
 
 
-        // test_scenario::next_tx(scenario_val, user1);
-        // {
+        test_scenario::next_tx(scenario_val, admin);
+        {
             
-            // let prediction = 444;
-            // let clock = clock::create_for_testing(test_scenario::ctx(scenario_val));
+            let guess = 444;
+            let clock = clock::create_for_testing(test_scenario::ctx(scenario_val));
             
         
-            // let wrapper = make_prediction(prediction, &clock, test_scenario::ctx(scenario_val));
+            let (kiosk, kiosk_owner_cap) = create_kiosk(test_scenario::ctx(scenario_val));
             
-            // let kiosk: &mut Kiosk; 
-            // let kiosk_cap: &KioskOwnerCap; 
-            // let tp: &TransferPolicy<Prediction>; 
+            
+            let publisher = test_scenario::take_from_sender<Publisher>(scenario_val);
+            let registry = test_scenario::take_from_sender<Registry>(scenario_val);
+            
+            
+            let (transfer_policy, transfer_policy_cap) = create_transfer_policy( publisher, test_scenario::ctx(scenario_val));
+           
+            make_prediction(kiosk, kiosk_owner_cap, guess, &clock, transfer_policy , test_scenario::ctx(scenario_val));
+            
 
-        
-            // unwrap(wrapper, kiosk, kiosk_cap, tp);
 
-            // clock::destroy_for_testing(clock);
-        // };
+            burn_from_kiosk( kiosk, kiosk_owner_cap, prediction_id, registry, test_scenario::ctx(scenario_val));
+
+
+           
+            test_scenario::return_to_sender(scenario_val, publisher);
+            test_scenario::return_to_sender(scenario_val, registry);
+
+            clock::destroy_for_testing(clock);
+        };
 
 
         
