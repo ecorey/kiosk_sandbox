@@ -21,6 +21,7 @@ module kiosk_practice::kiosk_practice_two {
     
     
     
+    
 
 
 
@@ -54,14 +55,12 @@ module kiosk_practice::kiosk_practice_two {
     // game struct
     struct Game has key, store {
         id: UID,
-        coin: String,
         balance: Balance<SUI>,
-        price: u64,
+        coin: String,
+        price: u64, // price to make a prediction, mod the make prediction to have a cost
         prev_id: Option<ID>,    
         cur_id: ID,
-        result: u64,
-        predict_epoch: Epoch,
-        report_epoch: Epoch,
+        
         
 
     }
@@ -71,13 +70,48 @@ module kiosk_practice::kiosk_practice_two {
     // struct to hold a game instance
     struct GameInstance has key, store {
         id: UID,
-        game_id: ID,
-        game_inst: Option<Game>,
+        balance: Balance<SUI>, // holds the balance of the game instance, init to zero
+        result: u64,  // will hold the result from the switchboard oracle, initialize to zero / add update function
+        predict_epoch: Epoch, // start and end time for predictions
+        report_epoch: Epoch, // start and end time for reporting the winner
         
     }
 
 
+    // create a new game instance
+    public fun new_instance(predict_epoch: Epoch, report_epoch: Epoch, ctx: &mut TxContext) : GameInstance {
+        GameInstance {
+            id: object::new(ctx),
+            balance: balance::zero<SUI>(),
+            result: 0,
+            predict_epoch,
+            report_epoch,
+        }
+    }
 
+
+
+    // create a new game
+    public fun new_game() {
+
+    }
+
+
+
+    // startst the game and allows predictions to be made
+    public fun start_game() {
+
+    }
+
+
+
+    // close the game and allows the report winner function to be called
+    public fun close_game() {
+
+    }
+
+
+    
     
 
 
@@ -159,20 +193,6 @@ module kiosk_practice::kiosk_practice_two {
         royalty_policy::set<Prediction>(policy, cap, amount_bp);
     }
 
-
-
-
-    // create a new game
-    public fun new_game() {
-
-    }
-
-
-
-    // new instance
-    fun new_instance() {
-
-    }
 
 
 
@@ -265,7 +285,7 @@ module kiosk_practice::kiosk_practice_two {
 
 
     // claim the winner within timeframe by ref, add event to mark the winner
-    public fun report_winner(prediction: &Prediction, game: &mut Game, clock: &Clock ) {
+    public fun report_winner(prediction: &Prediction, game: &mut GameInstance, clock: &Clock ) {
         assert!(clock::timestamp_ms(clock) > game.predict_epoch.start_time, EOutsideWindow);
         assert!(clock::timestamp_ms(clock) < game.predict_epoch.end_time, EOutsideWindow);
     } 
@@ -416,6 +436,7 @@ module kiosk_practice::kiosk_practice_two {
 // add consts, asserts, and tests
 // add switchboard oracle prototype
 // ptb for making predictions
+// add display for teh prediction
 
 
 
