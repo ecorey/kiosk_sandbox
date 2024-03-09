@@ -24,6 +24,7 @@ module kiosk_practice::kiosk_practice_two {
     
     // errors
     const EOutsideWindow: u64 = 0;
+    const EIncorrectPrediction: u64 = 1;
 
     
 
@@ -33,7 +34,8 @@ module kiosk_practice::kiosk_practice_two {
     // ################################## 
 
     // struct to hold game times
-    struct Epoch has store {
+    struct Epoch has key, store {
+       id: UID,
        start_time: u64,
        end_time: u64,
 
@@ -66,7 +68,7 @@ module kiosk_practice::kiosk_practice_two {
     struct GameInstance has key, store {
         id: UID,
         balance: Balance<SUI>, // holds the balance of the game instance, init to zero
-        result: u64,  // will hold the result from the switchboard oracle, initialize to zero / add update function
+        result: Option<u64>,  // will hold the result from the switchboard oracle, initialize to zero / add update function
         predict_epoch: Epoch, // start and end time for predictions
         report_epoch: Epoch, // start and end time for reporting the winner
         
@@ -79,7 +81,7 @@ module kiosk_practice::kiosk_practice_two {
         GameInstance {
             id: object::new(ctx),
             balance: balance::zero<SUI>(),
-            result: 0,
+            result: option::none(),
             predict_epoch,
             report_epoch,
         }
@@ -122,7 +124,45 @@ module kiosk_practice::kiosk_practice_two {
     }
 
 
-    
+
+    fun set_predict_epoch(start_time: u64, end_time: u64, ctx: &mut TxContext)  {
+        
+        let predict_epoch  = Epoch {
+            id: object::new(ctx),
+            start_time,
+            end_time,
+        };
+
+        transfer::transfer(predict_epoch, tx_context::sender(ctx));
+
+    }
+
+
+
+    fun set_report_epoch(start_time: u64, end_time: u64, ctx: &mut TxContext) {
+        
+        let report_epoch  = Epoch {
+            id: object::new(ctx),
+            start_time,
+            end_time,
+        };
+
+        transfer::transfer(report_epoch, tx_context::sender(ctx));
+
+    }
+
+
+    // claim the winner within timeframe by ref, add event to mark the winner
+    public fun report_winner(prediction: &Prediction, game: &Game, game_instance: &GameInstance, clock: &Clock ) {
+        assert!(clock::timestamp_ms(clock) > game_instance.predict_epoch.start_time, EOutsideWindow);
+        assert!(clock::timestamp_ms(clock) < game_instance.predict_epoch.end_time, EOutsideWindow);
+
+        assert!(clock::timestamp_ms(clock) > game_instance.report_epoch.start_time, EOutsideWindow);
+        assert!(clock::timestamp_ms(clock) < game_instance.report_epoch.end_time, EOutsideWindow);
+
+        assert!(prediction.prediction == game_instance.result, EIncorrectPrediction);
+    } 
+
     
 
 
@@ -311,12 +351,7 @@ module kiosk_practice::kiosk_practice_two {
 
 
 
-    // claim the winner within timeframe by ref, add event to mark the winner
-    public fun report_winner(prediction: &Prediction, game: &mut GameInstance, clock: &Clock ) {
-        assert!(clock::timestamp_ms(clock) > game.predict_epoch.start_time, EOutsideWindow);
-        assert!(clock::timestamp_ms(clock) < game.predict_epoch.end_time, EOutsideWindow);
-    } 
-
+    
 
 
     // withdraw from a personal kiosk
