@@ -16,6 +16,7 @@ module kiosk_practice::kiosk_practice_two {
     use sui::table::Table;
     use sui::coin::{Self, Coin};    
     use sui::clock::{Self, Clock};
+    // use sui::royalty_rule::{add};
     
     
 
@@ -138,9 +139,16 @@ module kiosk_practice::kiosk_practice_two {
 
 
 
-    public fun add_to_policy(){
+    // public fun add_royality_to_policy(
+    //     policy: &mut TransferPolicy<Prediction>, 
+    //     cap: &TransferPolicyCap<Prediction>,
+    //     amount_bp: u16,
+    //     min_amount: u64
+    //     ){
+            
+    //     royalty_rule::add(policy, cap, amount_bp, min_amount);
 
-    }
+    // }
 
 
     // create a new game
