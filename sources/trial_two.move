@@ -29,18 +29,19 @@ module kiosk_practice::kiosk_practice_two {
     const EOutsideWindow: u64 = 0;
 
 
-    // OTW for the kiosk init function
+    // OTW for the init function
     struct KIOSK_PRACTICE_TWO has drop {}
     
 
 
 
-    // game owner cap
+    // game owner cap that goes to sender of the init function
     struct GameOwnerCap has key {
         id: UID,
     }
 
 
+    // struct to hold game times
     struct Epoch has store {
        start_time: u64,
        end_time: u64,
@@ -48,7 +49,7 @@ module kiosk_practice::kiosk_practice_two {
     }
 
 
-    // game
+    // game struct
     struct Game has key, store {
         id: UID,
         coin: String,
@@ -65,11 +66,11 @@ module kiosk_practice::kiosk_practice_two {
 
     
 
-
+    // struct to hold a game instance
     struct GameInstance has key, store {
         id: UID,
         game_id: ID,
-        balance: Balance<SUI>,
+        game_inst: Option<Game>,
         
     }
 
@@ -79,7 +80,6 @@ module kiosk_practice::kiosk_practice_two {
 
 
     // event emitted when a prediction is made
-    // add ID to the event to connect to the prediction
     // user only needs to predict the repub and dem can be caluculated from the total count
     struct PredictionMade has copy, drop {
         prediction: Option<u64>,
@@ -99,7 +99,7 @@ module kiosk_practice::kiosk_practice_two {
 
 
 
-    // registry for transfer policy
+    // registry that will hold the transfer policy
     struct Registry has key, store {
         id: UID, 
         tp: TransferPolicy<Prediction>,
@@ -109,8 +109,8 @@ module kiosk_practice::kiosk_practice_two {
 
 
 
-    // init to make the transfer policy a shared object 
-    // and transfer the game owner cap to the sender
+    // init creates the transfer policy and stores it in the regisry which is a shared object 
+    // and transfers the transfer policy cap and game owner cap to the sender
     fun init(otw: KIOSK_PRACTICE_TWO, ctx: &mut TxContext) {
 
         
@@ -165,7 +165,8 @@ module kiosk_practice::kiosk_practice_two {
 
 
 
-    // creates a kiosk that holds the prediction
+    // creates a new kiosk for a user that can hold the predictions 
+    // and returns the kiosk and the kiosk owner cap
     public fun create_kiosk(ctx: &mut TxContext) : (Kiosk, KioskOwnerCap) {
         let (kiosk, kiosk_owner_cap) = kiosk::new(ctx);
         (kiosk, kiosk_owner_cap)
@@ -174,7 +175,7 @@ module kiosk_practice::kiosk_practice_two {
 
 
 
-    // mint a prediction and locks it in teh users kiosk and emits the event
+    // makes a prediction and locks it in the users kiosk and emits an event for the prediction
     public fun make_prediction(kiosk: &mut Kiosk, kiosk_owner_cap: &KioskOwnerCap, predict: u64, clock: &Clock, _tp: &TransferPolicy<Prediction>, ctx: &mut TxContext)  {
         
         
@@ -202,11 +203,7 @@ module kiosk_practice::kiosk_practice_two {
     }
 
 
-
-    
-
-
-
+    // burns the prediction from the kiosk and deletes the prediction
     public fun burn_from_kiosk( kiosk: &mut Kiosk, kiosk_cap: &KioskOwnerCap, prediction_id: ID, registry: &mut Registry, ctx: &mut TxContext) {
 
         let purchase_cap = kiosk::list_with_purchase_cap<Prediction>( kiosk, kiosk_cap, prediction_id, 0, ctx); 
@@ -220,7 +217,7 @@ module kiosk_practice::kiosk_practice_two {
 
 
 
-
+    // lists the prediction in the kiosk for sale
     public fun list_prediction<T: key + store>(
         kiosk: &mut Kiosk, 
         kiosk_cap: &KioskOwnerCap, 
@@ -231,7 +228,7 @@ module kiosk_practice::kiosk_practice_two {
     }
 
 
-
+    // delists the prediction from the kiosk
     public fun delist_prediction<T: key + store>(
         kiosk: &mut Kiosk,
         kiosk_cap: &KioskOwnerCap,
@@ -242,7 +239,7 @@ module kiosk_practice::kiosk_practice_two {
 
 
 
-    // report winner within timeframe by ref , add event
+    // reports the winner within timeframe by ref, add event to mark the winner
     public fun report_winner(prediction: &Prediction, game: &mut Game, clock: &Clock ) {
         assert!(clock::timestamp_ms(clock) > game.predict_epoch.start_time, EOutsideWindow);
         assert!(clock::timestamp_ms(clock) < game.predict_epoch.end_time, EOutsideWindow);
@@ -250,7 +247,7 @@ module kiosk_practice::kiosk_practice_two {
 
 
 
-    // purchase the prediction from the kiosk
+    // purchase a prediction from another user
     public fun purchase_prediction<T: key + store>(
         kiosk: &mut Kiosk,
         prediction_id: ID,
@@ -258,10 +255,15 @@ module kiosk_practice::kiosk_practice_two {
         
     ) : (Prediction, TransferRequest<Prediction>) {
 
-
         kiosk::purchase<Prediction>(kiosk, prediction_id, payment)
-
     }
+
+
+    // withdraw balance functions
+    // from the kiosk and the game
+
+
+
 
 
     // clean up functions
@@ -276,6 +278,7 @@ module kiosk_practice::kiosk_practice_two {
     public fun test_init() {
 
         use sui::test_scenario;
+        use sui::test_utils;
         use sui::kiosk_test_utils::{Self as test, Asset};
 
 
@@ -315,18 +318,19 @@ module kiosk_practice::kiosk_practice_two {
         {
             // setup
             let guess = 444;
+
             let clock = clock::create_for_testing(test_scenario::ctx(scenario_val));
 
-            // let coin = coin::mint_for_testing<SUI>(100, test_scenario::ctx(scenario_val));
+            let coin = coin::mint_for_testing<SUI>(100, test_scenario::ctx(scenario_val));
             
-                
             let (kiosk, kiosk_owner_cap) = test::get_kiosk(test_scenario::ctx(scenario_val));
 
             let publisher = test::get_publisher(test_scenario::ctx(scenario_val));
 
             
             
-
+            
+            
 
             // MAKE PREDICTION AND BURN PREDICTION
             // make_prediction(&mut kiosk, &kiosk_owner_cap, guess, &clock, &transfer_policy, test_scenario::ctx(scenario_val));
@@ -335,9 +339,12 @@ module kiosk_practice::kiosk_practice_two {
 
 
 
+
+
             // CLEANUP 
 
-            
+            transfer::public_transfer(coin, admin);
+
             test::return_publisher(publisher);
 
             test::return_kiosk(kiosk, kiosk_owner_cap, test_scenario::ctx(scenario_val));
