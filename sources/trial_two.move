@@ -210,7 +210,7 @@ module kiosk_practice::kiosk_practice_two {
 
         let purchase_cap = kiosk::list_with_purchase_cap<Prediction>( kiosk, kiosk_cap, prediction_id, 0, ctx); 
         let ( prediction, transfer_request)  = kiosk::purchase_with_cap<Prediction>(kiosk, purchase_cap, coin::zero<SUI>(ctx));
-        confirm_request<Prediction>( &registry.tp, transfer_request  );
+        tp::confirm_request<Prediction>( &registry.tp, transfer_request  );
 
         let Prediction {id, prediction_id: _, prediction: _, timestamp: _} = prediction;
         object::delete(id);
