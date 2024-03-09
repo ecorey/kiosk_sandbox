@@ -19,24 +19,24 @@ module kiosk_practice::kiosk_practice_two {
 
     use kiosk_practice::royalty_policy;
     
-    
+
+
     
     // errors
     const EOutsideWindow: u64 = 0;
 
-
-
-
-    // OTW for the init function
-    struct KIOSK_PRACTICE_TWO has drop {}
     
 
 
+    // ##################################
+    // ############GAME LOGIC############
+    // ################################## 
 
     // game owner cap that goes to sender of the init function
     struct GameOwnerCap has key {
         id: UID,
     }
+
 
 
     // struct to hold game times
@@ -45,6 +45,7 @@ module kiosk_practice::kiosk_practice_two {
        end_time: u64,
 
     }
+
 
 
     // game struct
@@ -56,11 +57,10 @@ module kiosk_practice::kiosk_practice_two {
         prev_id: Option<ID>,    
         cur_id: ID,
         
-        
 
     }
 
-    
+
 
     // struct to hold a game instance
     struct GameInstance has key, store {
@@ -111,13 +111,16 @@ module kiosk_practice::kiosk_practice_two {
     
 
 
+    // ########################################
+    // ############PREDICTION LOGIC############
+    // ########################################
+
     // event emitted when a prediction is made
     // user only needs to predict the repub and dem can be caluculated from the total count
     struct PredictionMade has copy, drop {
         prediction: Option<u64>,
         made_by: address,
     }
-
 
 
 
@@ -132,6 +135,45 @@ module kiosk_practice::kiosk_practice_two {
 
 
 
+    // makes a prediction and locks it in the users kiosk and emits an event for the prediction
+    public fun make_prediction(kiosk: &mut Kiosk, kiosk_owner_cap: &KioskOwnerCap, predict: u64, clock: &Clock, _tp: &TransferPolicy<Prediction>, ctx: &mut TxContext)  {
+        
+        
+        event::emit(PredictionMade {
+            prediction: option::some(predict),
+            made_by: tx_context::sender(ctx),
+        });
+
+        let id = object::new(ctx);
+        let prediction_id = object::uid_to_inner(&id);
+
+        let prediction = Prediction {
+            id, 
+            prediction_id,
+            prediction: option::some(predict),
+            timestamp: clock::timestamp_ms(clock),
+        };
+
+
+        // place and lock item into the kiosk
+        kiosk::lock(kiosk, kiosk_owner_cap, _tp, prediction);
+       
+
+        
+    }
+
+
+
+
+
+    // #####################################################
+    // ############INIT  / TRANSFER POLICY LOGIC############
+    // #####################################################
+
+    // OTW for the init function
+    struct KIOSK_PRACTICE_TWO has drop {}
+    
+
 
     // registry that will hold the transfer policy
     struct Registry has key, store {
@@ -139,8 +181,6 @@ module kiosk_practice::kiosk_practice_two {
         tp: TransferPolicy<Prediction>,
     }
     
-
-
 
 
     // init creates the transfer policy and stores it in the regisry which is a shared object 
@@ -176,9 +216,8 @@ module kiosk_practice::kiosk_practice_two {
 
     }
 
-
-
     
+
     // adds the royalty rule to the transfer policy
    public fun add_royalty_to_policy(
         policy: &mut TransferPolicy<Prediction>,
@@ -191,6 +230,12 @@ module kiosk_practice::kiosk_practice_two {
 
 
 
+    
+
+
+    // ###################################
+    // ############KIOSK LOGIC############
+    // ###################################
 
     // creates a new kiosk for a user that can hold the predictions 
     // and returns the kiosk and the kiosk owner cap
@@ -199,35 +244,6 @@ module kiosk_practice::kiosk_practice_two {
         (kiosk, kiosk_owner_cap)
     }
 
-
-
-
-    // makes a prediction and locks it in the users kiosk and emits an event for the prediction
-    public fun make_prediction(kiosk: &mut Kiosk, kiosk_owner_cap: &KioskOwnerCap, predict: u64, clock: &Clock, _tp: &TransferPolicy<Prediction>, ctx: &mut TxContext)  {
-        
-        
-        event::emit(PredictionMade {
-            prediction: option::some(predict),
-            made_by: tx_context::sender(ctx),
-        });
-
-        let id = object::new(ctx);
-        let prediction_id = object::uid_to_inner(&id);
-
-        let prediction = Prediction {
-            id, 
-            prediction_id,
-            prediction: option::some(predict),
-            timestamp: clock::timestamp_ms(clock),
-        };
-
-
-        // place and lock item into the kiosk
-        kiosk::lock(kiosk, kiosk_owner_cap, _tp, prediction);
-       
-
-        
-    }
 
 
     // burns the prediction from the kiosk and deletes the prediction
@@ -288,11 +304,6 @@ module kiosk_practice::kiosk_practice_two {
 
 
 
-    
-    // withdraw balance functions
-    // from the kiosk and the game
-
-
     // withdraw from a personal kiosk
     public fun withdraw_from_kiosk(kiosk: &mut Kiosk, kiosk_owner_cap: &KioskOwnerCap, amount: Option<u64>, ctx: &mut TxContext) : Coin<SUI> {
         kiosk::withdraw(kiosk, kiosk_owner_cap, amount, ctx)
@@ -308,6 +319,11 @@ module kiosk_practice::kiosk_practice_two {
 
 
 
+
+    // ###################################
+    // ############ORACLE LOGIC###########
+    // ###################################
+
     // function to call switchboard oracle prototype to pull the final results
 
 
@@ -315,16 +331,14 @@ module kiosk_practice::kiosk_practice_two {
 
 
 
-    // clean up functions
 
 
 
 
+    // ###################################
+    // ############TESTS##################
+    // ###################################
 
-
-
-
-    // TESTS
     #[test]
     public fun test_init() {
 
@@ -425,7 +439,9 @@ module kiosk_practice::kiosk_practice_two {
 
 
 
-
+// ###################################
+// ############TODO###################
+// ###################################
 
 // only need one value as a + b = 538
 // add transfer policy rules and create the empty_policy function
