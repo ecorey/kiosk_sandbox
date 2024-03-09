@@ -277,6 +277,18 @@ module kiosk_practice::kiosk_practice_two {
     // from the kiosk and the game
 
 
+    // withdraw from a personal kiosk
+    public fun withdraw_from_kiosk(kiosk: &mut Kiosk, kiosk_owner_cap: &KioskOwnerCap, amount: Option<u64>, ctx: &mut TxContext) : Coin<SUI> {
+        kiosk::withdraw(kiosk, kiosk_owner_cap, amount, ctx)
+    }
+
+
+
+    // withdraw from the transfer policy
+    public fun withdraw_from_tranfer_policy( transfer_policy: &mut TransferPolicy<Prediction>, transfer_policy_cap: &TransferPolicyCap<Prediction>, amount: Option<u64>, ctx: &mut TxContext ) : Coin<SUI> {
+        tp::withdraw(transfer_policy, transfer_policy_cap, amount, ctx)
+    }
+
 
 
 
