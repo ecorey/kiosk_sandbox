@@ -32,18 +32,18 @@ module kiosk_practice::kiosk_practice_two {
     // ############GAME LOGIC############
     // ################################## 
 
-    // game owner cap that goes to sender of the init function
-    struct GameOwnerCap has key {
-        id: UID,
-    }
-
-
-
     // struct to hold game times
     struct Epoch has store {
        start_time: u64,
        end_time: u64,
 
+    }
+
+
+
+    // game owner cap that goes to sender of the init function
+    struct GameOwnerCap has key {
+        id: UID,
     }
 
 
@@ -75,7 +75,7 @@ module kiosk_practice::kiosk_practice_two {
 
 
     // create a new game instance
-    public fun new_instance(predict_epoch: Epoch, report_epoch: Epoch, ctx: &mut TxContext) : GameInstance {
+    fun new_instance(predict_epoch: Epoch, report_epoch: Epoch, ctx: &mut TxContext) : GameInstance {
         GameInstance {
             id: object::new(ctx),
             balance: balance::zero<SUI>(),
@@ -88,14 +88,29 @@ module kiosk_practice::kiosk_practice_two {
 
 
     // create a new game
-    public fun new_game() {
+    fun new_game(instance: &GameInstance, coin: String, price: u64, ctx: &mut TxContext) : Game {
+        Game {
+            id: object::new(ctx),
+            balance: balance::zero<SUI>(),
+            coin,
+            price,
+            prev_id: option::none(),
+            cur_id: object::id(instance),
+        }
 
     }
 
 
 
     // startst the game and allows predictions to be made
-    public fun start_game() {
+    public fun start_game(_: &GameOwnerCap, coin: String, price: u64, predict_epoch: Epoch, report_epoch: Epoch, ctx: &mut TxContext)  {
+
+        let instance = new_instance(predict_epoch, report_epoch, ctx);
+        let game = new_game(&instance, coin, price, ctx);
+        
+        transfer::share_object(game);
+        transfer::share_object(instance);
+
 
     }
 
