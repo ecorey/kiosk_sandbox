@@ -62,12 +62,7 @@ module kiosk_practice::kiosk_practice_two {
 
     }
 
-    // report winner within timeframe by ref , add event
-    public fun report_winner(prediction: &Prediction, game: &mut Game, clock: &Clock ) {
-        assert!(clock::timestamp_ms(clock) > game.predict_epoch.start_time, EOutsideWindow);
-        assert!(clock::timestamp_ms(clock) < game.predict_epoch.end_time, EOutsideWindow);
-    } 
-
+    
 
 
     struct GameInstance has key, store {
@@ -104,34 +99,36 @@ module kiosk_practice::kiosk_practice_two {
 
 
     // registry for transfer policy
-    struct Registry has key {
+    struct Registry has key, store {
         id: UID, 
         tp: TransferPolicy<Prediction>,
     }
     
 
-    // struct RoyaltyRuleConfig has store, drop {
-    //     royalty_percentage: u64, 
-    // }
-
-    // struct FloorRuleConfig has store, drop {
-    //     minimum_amount: u64, 
-    // }
 
 
 
     // init to make the transfer policy a shared object 
     // and transfer the game owner cap to the sender
     fun init(otw: KIOSK_PRACTICE_TWO, ctx: &mut TxContext) {
+
+        
+
         let publisher = package::claim(otw, ctx);
 
 
         let ( transfer_policy, tp_cap ) = tp::new<Prediction>(&publisher, ctx);
 
+        
+        let registry = Registry {
+            id: object::new(ctx),
+            tp: transfer_policy,
+        };
+
         transfer::public_transfer(publisher, tx_context::sender(ctx));
         transfer::public_transfer(tp_cap, tx_context::sender(ctx));
-
-        transfer::public_share_object(transfer_policy);
+        transfer::public_share_object(registry);
+        
 
         transfer::transfer(GameOwnerCap {
             id: object::new(ctx),
@@ -142,23 +139,27 @@ module kiosk_practice::kiosk_practice_two {
 
     // creates an transfer policy and publicly shares it
     // todo create rules for the transfer policy / add royalty rule and floor rule
-    public fun create_transfer_policy( publisher: &Publisher, ctx: &mut TxContext) : (TransferPolicy<Prediction>, TransferPolicyCap<Prediction>) {
+    // public fun create_transfer_policy( publisher: &Publisher, ctx: &mut TxContext)  {
 
-        let (transfer_policy, transfer_policy_cap) = tp::new<Prediction>(publisher, ctx);
+    //     let ( transfer_policy, tp_cap ) = tp::new<Prediction>(&publisher, ctx);
+
+    //     let registry = Registry {
+    //         id: object::new(ctx),
+    //         tp: transfer_policy,
+    //     };
        
-        // let royalty_config = RoyaltyRuleConfig { royalty_percentage: 05 }; 
-        // let floor_config = FloorRuleConfig { minimum_amount: 100 };
-
-
-        // add_rule<RoyaltyRuleConfig>(royalty_config, &mut transfer_policy, &transfer_policy_cap, royalty_config);
-        // add_rule<FloorRuleConfig>(floor_config, &mut transfer_policy, &transfer_policy_cap, floor_config);
         
 
-        (transfer_policy, transfer_policy_cap)
+    //     transfer::public_transfer(transfer_policy_cap, tx_context::sender(ctx));
+    //     transfer::public_share_object(registry);
+
+    // }
+
+
+
+    public fun add_to_policy(){
 
     }
-
-
 
 
     // create a new game
@@ -253,6 +254,14 @@ module kiosk_practice::kiosk_practice_two {
 
 
 
+    // report winner within timeframe by ref , add event
+    public fun report_winner(prediction: &Prediction, game: &mut Game, clock: &Clock ) {
+        assert!(clock::timestamp_ms(clock) > game.predict_epoch.start_time, EOutsideWindow);
+        assert!(clock::timestamp_ms(clock) < game.predict_epoch.end_time, EOutsideWindow);
+    } 
+
+
+
     // purchase the prediction from the kiosk
     public fun purchase_prediction<T: key + store>(
         kiosk: &mut Kiosk,
@@ -324,13 +333,15 @@ module kiosk_practice::kiosk_practice_two {
             // setup
             let guess = 444;
             let clock = clock::create_for_testing(test_scenario::ctx(scenario_val));
+
+            let coin = coin::mint_for_testing<SUI>(100, test_scenario::ctx(scenario_val));
             
                 
             let (kiosk, kiosk_owner_cap) = test::get_kiosk(test_scenario::ctx(scenario_val));
 
             let publisher = test::get_publisher(test_scenario::ctx(scenario_val));
 
-            // let ( transfer_policy, transfer_policy_cap) = create_transfer_policy(&publisher, test_scenario::ctx(scenario_val));
+            let ( transfer_policy, transfer_policy_cap) = create_transfer_policy(&publisher, test_scenario::ctx(scenario_val));
             
             
 
@@ -344,10 +355,14 @@ module kiosk_practice::kiosk_practice_two {
 
             // CLEANUP 
 
-            // let balance = return_policy(transfer_policy, transfer_policy_cap, test_scenario::ctx(scenario_val));
+            let balance = return_policy(transfer_policy, transfer_policy_cap, test_scenario::ctx(scenario_val));
 
-            // let _amount_burned = coin::burn_for_testing(balance);
+            coin::join(&mut coin, balance);
+
+            transfer::public_transfer(coin, admin);
             
+
+
             test::return_publisher(publisher);
 
             test::return_kiosk(kiosk, kiosk_owner_cap, test_scenario::ctx(scenario_val));
