@@ -88,6 +88,7 @@ module kiosk_practice::kiosk_practice_two {
 
 
 
+
     // the prediction struct
     struct Prediction has key, store {
         id: UID,
@@ -96,6 +97,7 @@ module kiosk_practice::kiosk_practice_two {
         timestamp: u64,
         
     }
+
 
 
 
@@ -228,6 +230,7 @@ module kiosk_practice::kiosk_practice_two {
     }
 
 
+
     // delists the prediction from the kiosk
     public fun delist_prediction<T: key + store>(
         kiosk: &mut Kiosk,
@@ -236,14 +239,6 @@ module kiosk_practice::kiosk_practice_two {
     ) {
         kiosk::delist<Prediction>(kiosk, kiosk_cap, prediction_id);
     }
-
-
-
-    // reports the winner within timeframe by ref, add event to mark the winner
-    public fun report_winner(prediction: &Prediction, game: &mut Game, clock: &Clock ) {
-        assert!(clock::timestamp_ms(clock) > game.predict_epoch.start_time, EOutsideWindow);
-        assert!(clock::timestamp_ms(clock) < game.predict_epoch.end_time, EOutsideWindow);
-    } 
 
 
 
@@ -259,6 +254,16 @@ module kiosk_practice::kiosk_practice_two {
     }
 
 
+
+    // reports the winner within timeframe by ref, add event to mark the winner
+    public fun report_winner(prediction: &Prediction, game: &mut Game, clock: &Clock ) {
+        assert!(clock::timestamp_ms(clock) > game.predict_epoch.start_time, EOutsideWindow);
+        assert!(clock::timestamp_ms(clock) < game.predict_epoch.end_time, EOutsideWindow);
+    } 
+
+
+
+    
     // withdraw balance functions
     // from the kiosk and the game
 
@@ -280,7 +285,7 @@ module kiosk_practice::kiosk_practice_two {
         use sui::test_scenario;
         use sui::test_utils;
         use sui::kiosk_test_utils::{Self as test, Asset};
-
+        use std::debug;
 
         let admin = @0x1;
         let user1 = @0x2;
@@ -328,7 +333,9 @@ module kiosk_practice::kiosk_practice_two {
             let publisher = test::get_publisher(test_scenario::ctx(scenario_val));
 
             
+
             
+            std::debug::print(&clock);
             
             
 
