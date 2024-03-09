@@ -21,15 +21,10 @@ module kiosk_practice::kiosk_practice_two {
     
     
     
-    
-
-
-
-
-
-
     // errors
     const EOutsideWindow: u64 = 0;
+
+
 
 
     // OTW for the init function
@@ -76,6 +71,7 @@ module kiosk_practice::kiosk_practice_two {
         report_epoch: Epoch, // start and end time for reporting the winner
         
     }
+
 
 
     // create a new game instance
@@ -312,7 +308,7 @@ module kiosk_practice::kiosk_practice_two {
 
 
 
-    // switchboard oracle prototype to pull the final results
+    // function to call switchboard oracle prototype to pull the final results
 
 
 
