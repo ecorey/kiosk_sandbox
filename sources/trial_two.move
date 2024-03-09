@@ -334,7 +334,7 @@ module kiosk_practice::kiosk_practice_two {
 
             
 
-            
+
             std::debug::print(&clock);
             
             
@@ -380,25 +380,16 @@ module kiosk_practice::kiosk_practice_two {
 
 
 
-// TODO
+
 
 
  
-// user gets predictin with timeline and winenr claims within a timeperiod 
-
-// dont use shared object let user claim
-
-// time windows 
 
 
 // vector to hold values
 // only need one value as a + b = 538
-// add timestamp to the prediction
-// create game_data struct that is a shared object and holds vector of predictions
 // add transfer policy rules and create the empty_policy function
 // add consts, asserts, and tests
-// add game elements (new, instance, finalize, ext.)
-// add table to store the predictions with an address
 // add switchboard oracle prototype
 // ptb for making predictions
 
