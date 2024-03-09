@@ -4,7 +4,7 @@ module kiosk_practice::kiosk_practice_two {
     use sui::kiosk::{Self, Kiosk, KioskOwnerCap};
     use sui::object::{Self, UID, ID};
     use sui::transfer;
-    use sui::transfer_policy::{Self as tp, TransferPolicy, TransferPolicyCap, TransferRequest, confirm_request, add_rule, new_request};
+    use sui::transfer_policy::{Self as tp, TransferPolicy, TransferPolicyCap, TransferRequest, confirm_request, new_request};
     use sui::tx_context::{TxContext, Self};
     use sui::package::{Self, Publisher};    
     use std::string::{String};
@@ -16,7 +16,9 @@ module kiosk_practice::kiosk_practice_two {
     use sui::table::Table;
     use sui::coin::{Self, Coin};    
     use sui::clock::{Self, Clock};
-    // use sui::royalty_rule::{add};
+
+    use kiosk_practice::royalty_policy;
+    
     
     
 
@@ -122,12 +124,17 @@ module kiosk_practice::kiosk_practice_two {
 
         let ( transfer_policy, tp_cap ) = tp::new<Prediction>(&publisher, ctx);
 
-        
+
+        // add royality rule to the transfer policy with a 5% royality fee
+        add_royalty_to_policy(&mut transfer_policy, &tp_cap, 005_00);
+
+        // adds tranfer policy to the registry
         let registry = Registry {
             id: object::new(ctx),
             tp: transfer_policy,
         };
 
+        // transfer the publisher, transfer policy cap and game owner cap to the sender and share the registry
         transfer::public_transfer(publisher, tx_context::sender(ctx));
         transfer::public_transfer(tp_cap, tx_context::sender(ctx));
         transfer::public_share_object(registry);
@@ -141,16 +148,18 @@ module kiosk_practice::kiosk_practice_two {
 
 
 
-    // public fun add_royality_to_policy(
-    //     policy: &mut TransferPolicy<Prediction>, 
-    //     cap: &TransferPolicyCap<Prediction>,
-    //     amount_bp: u16,
-    //     min_amount: u64
-    //     ){
-            
-    //     royalty_rule::add(policy, cap, amount_bp, min_amount);
+    
+    // adds the royalty rule to the transfer policy
+   public fun add_royalty_to_policy(
+        policy: &mut TransferPolicy<Prediction>,
+        cap: &TransferPolicyCap<Prediction>,
+        amount_bp: u16, 
+    ) {
+        
+        royalty_policy::set<Prediction>(policy, cap, amount_bp);
+    }
 
-    // }
+
 
 
     // create a new game
@@ -255,7 +264,7 @@ module kiosk_practice::kiosk_practice_two {
 
 
 
-    // reports the winner within timeframe by ref, add event to mark the winner
+    // claim the winner within timeframe by ref, add event to mark the winner
     public fun report_winner(prediction: &Prediction, game: &mut Game, clock: &Clock ) {
         assert!(clock::timestamp_ms(clock) > game.predict_epoch.start_time, EOutsideWindow);
         assert!(clock::timestamp_ms(clock) < game.predict_epoch.end_time, EOutsideWindow);
@@ -271,10 +280,17 @@ module kiosk_practice::kiosk_practice_two {
 
 
 
-    // clean up functions
-    
+    // switchboard oracle prototype to pull the final results
 
-    
+
+
+
+
+
+    // clean up functions
+
+
+
 
 
     //TESTS
@@ -381,12 +397,69 @@ module kiosk_practice::kiosk_practice_two {
 
 
 
+// Royalty Policy
+module kiosk_practice::royalty_policy {
+    use sui::sui::SUI;
+    use sui::coin::{Self, Coin};
+    use sui::tx_context::TxContext;
+    use sui::transfer_policy::{
+        Self as policy,
+        TransferPolicy,
+        TransferPolicyCap,
+        TransferRequest
+    };
+
+    /// The `amount_bp` passed is more than 100%.
+    const EIncorrectArgument: u64 = 0;
+    /// The `Coin` used for payment is not enough to cover the fee.
+    const EInsufficientAmount: u64 = 1;
+
+    /// Max value for the `amount_bp`.
+    const MAX_BPS: u16 = 10_000;
+
+    /// The "Rule" witness to authorize the policy.
+    struct Rule has drop {}
+
+    /// Configuration for the Rule.
+    struct Config has store, drop {
+        amount_bp: u16
+    }
+
+    /// Creator action: Set the Royalty policy for the `T`.
+    public fun set<T: key + store>(
+        policy: &mut TransferPolicy<T>,
+        cap: &TransferPolicyCap<T>,
+        amount_bp: u16
+    ) {
+        assert!(amount_bp < MAX_BPS, EIncorrectArgument);
+        policy::add_rule(Rule {}, policy, cap, Config { amount_bp })
+    }
+
+    /// Buyer action: Pay the royalty fee for the transfer.
+    public fun pay<T: key + store>(
+        policy: &mut TransferPolicy<T>,
+        request: &mut TransferRequest<T>,
+        payment: &mut Coin<SUI>,
+        ctx: &mut TxContext
+    ) {
+        let config: &Config = policy::get_rule(Rule {}, policy);
+        let paid = policy::paid(request);
+        let amount = (((paid as u128) * (config.amount_bp as u128) / 10_000) as u64);
+
+        assert!(coin::value(payment) >= amount, EInsufficientAmount);
+
+        let fee = coin::split(payment, amount, ctx);
+        policy::add_to_balance(Rule {}, policy, fee);
+        policy::add_receipt(Rule {}, request)
+    }
+}
+
 
 
  
 
 
-// vector to hold values
+
 // only need one value as a + b = 538
 // add transfer policy rules and create the empty_policy function
 // add consts, asserts, and tests
