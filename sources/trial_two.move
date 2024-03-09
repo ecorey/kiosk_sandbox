@@ -76,6 +76,14 @@ module kiosk_practice::kiosk_practice_two {
 
 
 
+    // event emitted when a winner is reported  
+    struct Winner has copy, drop {
+        prediction: Option<u64>,
+        made_by: address,
+    }
+
+
+
     // create a new game instance
     fun new_instance(predict_epoch: Epoch, report_epoch: Epoch, ctx: &mut TxContext) : GameInstance {
         GameInstance {
@@ -161,6 +169,14 @@ module kiosk_practice::kiosk_practice_two {
         assert!(clock::timestamp_ms(clock) < game_instance.report_epoch.end_time, EOutsideWindow);
 
         assert!(prediction.prediction == game_instance.result, EIncorrectPrediction);
+
+
+        if(prediction.prediction == game_instance.result) {
+            event::emit(Winner {
+                winner: tx_context::sender(ctx),
+                prediction: prediction.prediction,
+            });
+        }
     } 
 
     
