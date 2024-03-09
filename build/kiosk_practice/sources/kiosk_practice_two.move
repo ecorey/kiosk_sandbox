@@ -137,25 +137,6 @@ module kiosk_practice::kiosk_practice_two {
     }
 
 
-    // creates an transfer policy and publicly shares it
-    // todo create rules for the transfer policy / add royalty rule and floor rule
-    // public fun create_transfer_policy( publisher: &Publisher, ctx: &mut TxContext)  {
-
-    //     let ( transfer_policy, tp_cap ) = tp::new<Prediction>(&publisher, ctx);
-
-    //     let registry = Registry {
-    //         id: object::new(ctx),
-    //         tp: transfer_policy,
-    //     };
-       
-        
-
-    //     transfer::public_transfer(transfer_policy_cap, tx_context::sender(ctx));
-    //     transfer::public_share_object(registry);
-
-    // }
-
-
 
     public fun add_to_policy(){
 
@@ -206,7 +187,6 @@ module kiosk_practice::kiosk_practice_two {
 
 
         // place and lock item into the kiosk
-        // need to adjust because cannot list / delist if teh prediction is locked needs to be placed
         kiosk::lock(kiosk, kiosk_owner_cap, _tp, prediction);
        
 
@@ -277,12 +257,7 @@ module kiosk_practice::kiosk_practice_two {
 
 
     // clean up functions
-    public fun return_policy(policy: TransferPolicy<Prediction>, cap: TransferPolicyCap<Prediction>, ctx: &mut TxContext) : Coin<SUI> {
-        let profits = tp::destroy_and_withdraw(policy, cap, ctx);
-        profits
-        
-    }
-
+    
 
     
 
@@ -334,14 +309,13 @@ module kiosk_practice::kiosk_practice_two {
             let guess = 444;
             let clock = clock::create_for_testing(test_scenario::ctx(scenario_val));
 
-            let coin = coin::mint_for_testing<SUI>(100, test_scenario::ctx(scenario_val));
+            // let coin = coin::mint_for_testing<SUI>(100, test_scenario::ctx(scenario_val));
             
                 
             let (kiosk, kiosk_owner_cap) = test::get_kiosk(test_scenario::ctx(scenario_val));
 
             let publisher = test::get_publisher(test_scenario::ctx(scenario_val));
 
-            let ( transfer_policy, transfer_policy_cap) = create_transfer_policy(&publisher, test_scenario::ctx(scenario_val));
             
             
 
@@ -355,14 +329,7 @@ module kiosk_practice::kiosk_practice_two {
 
             // CLEANUP 
 
-            let balance = return_policy(transfer_policy, transfer_policy_cap, test_scenario::ctx(scenario_val));
-
-            coin::join(&mut coin, balance);
-
-            transfer::public_transfer(coin, admin);
             
-
-
             test::return_publisher(publisher);
 
             test::return_kiosk(kiosk, kiosk_owner_cap, test_scenario::ctx(scenario_val));
