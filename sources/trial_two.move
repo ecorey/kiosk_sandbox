@@ -153,7 +153,7 @@ module kiosk_practice::kiosk_practice_two {
 
 
     // claim the winner within timeframe by ref, add event to mark the winner
-    public fun report_winner(prediction: &Prediction, game_instance: &Game, clock: &Clock, ctx: &mut TxContext ) {
+    public fun claim_winner(prediction: &Prediction, game_instance: &Game, clock: &Clock, ctx: &mut TxContext ) : (bool, address) {
         assert!(clock::timestamp_ms(clock) > game_instance.predict_epoch.start_time, EOutsideWindow);
         assert!(clock::timestamp_ms(clock) < game_instance.predict_epoch.end_time, EOutsideWindow);
 
@@ -162,6 +162,7 @@ module kiosk_practice::kiosk_practice_two {
 
         assert!(prediction.prediction == game_instance.result, EIncorrectPrediction);
 
+        let bool_val = true;
 
         if(prediction.prediction == game_instance.result) {
             event::emit(Winner {
@@ -169,7 +170,18 @@ module kiosk_practice::kiosk_practice_two {
                 made_by: tx_context::sender(ctx),
                 time: clock::timestamp_ms(clock),
             });
-        }
+        };
+
+
+        if(prediction.prediction == game_instance.result) {
+            let bool_val = true;
+        } else {
+            let bool_val = false;
+        };
+
+        (bool_val, tx_context::sender(ctx))
+
+
     } 
     
 
