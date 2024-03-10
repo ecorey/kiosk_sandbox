@@ -61,7 +61,7 @@
 // when the init function is called, it creates the transfer policy and stores it in the regisry which is a shared object
 // and transfers the transfer policy cap and game owner cap to the sender
 // the game owner cap is then used to start the game and close the game
-// the transfer policy is used to enforce a royalty fee when making a prediction
+// the transfer policy is used to enforce a 5% royalty fee when making a prediction
 // the predictions are held and locked in a users kiosk and they can be listed/ delisted, purchased, and burned.
 // the game owner cap is used to close the game and allow the claim the winner function to be called
 // the winner can then claim the pot and the game instance is deleted
@@ -99,6 +99,7 @@ module kiosk_practice::kiosk_practice_two {
     const EOutsideWindow: u64 = 0;
     const EIncorrectPrediction: u64 = 1;
     const EGameNotClosed: u64 = 2;
+    const EWrongPrice: u64 = 3;
 
 
 
@@ -126,6 +127,7 @@ module kiosk_practice::kiosk_practice_two {
     // struct to hold a game instance
     struct Game has key, store {
         id: UID,
+        price: u64,
         pot: Balance<SUI>, // holds the balance of the game instance, init to zero
         result: Option<u64>,  // will hold the result from the switchboard oracle, initialize to zero / add update function
         predict_epoch: Epoch, // start and end time for predictions
@@ -158,9 +160,10 @@ module kiosk_practice::kiosk_practice_two {
 
 
     // create a new game instance
-    fun new_game(predict_epoch: Epoch, report_epoch: Epoch, ctx: &mut TxContext) : Game {
+    fun new_game(price: u64, predict_epoch: Epoch, report_epoch: Epoch, ctx: &mut TxContext) : Game {
         Game {
             id: object::new(ctx),
+            price, 
             pot: balance::zero<SUI>(),
             result: option::none(),
             predict_epoch,
@@ -186,7 +189,7 @@ module kiosk_practice::kiosk_practice_two {
         });
 
 
-        let game = new_game(predict_epoch, report_epoch, ctx);
+        let game = new_game(price, predict_epoch, report_epoch, ctx);
         
         transfer::share_object(game);
         
@@ -194,7 +197,7 @@ module kiosk_practice::kiosk_practice_two {
 
 
     // REDO
-    // close the game/ sets teh result and allows the report winner function to be called
+    // close the game/ sets the result and allows the report winner function to be called
     public fun close_game(_: &GameOwnerCap, game_instance: &mut Game, aggregator: &Aggregator, ctx: &mut TxContext) : bool {
         
         assert!(game_instance.predict_epoch.end_time < tx_context::epoch(ctx), EOutsideWindow);
@@ -217,11 +220,13 @@ module kiosk_practice::kiosk_practice_two {
         
         assert!(game_instance.game_closed, EGameNotClosed);
 
-        assert!(clock::timestamp_ms(clock) > game_instance.predict_epoch.start_time, EOutsideWindow);
-        assert!(clock::timestamp_ms(clock) < game_instance.predict_epoch.end_time, EOutsideWindow);
-
+        //checks the timestamp is within the report epoch timeframe
         assert!(clock::timestamp_ms(clock) > game_instance.report_epoch.start_time, EOutsideWindow);
         assert!(clock::timestamp_ms(clock) < game_instance.report_epoch.end_time, EOutsideWindow);
+
+        // checks the prediction is within the predict epoch timeframe
+        assert!(prediction.timestamp > game_instance.predict_epoch.start_time, EOutsideWindow);
+        assert!(prediction.timestamp < game_instance.predict_epoch.end_time, EOutsideWindow);
 
         assert!(prediction.prediction == game_instance.result, EIncorrectPrediction);
 
@@ -254,7 +259,7 @@ module kiosk_practice::kiosk_practice_two {
             transfer::public_transfer(winning_pot, tx_context::sender(ctx));
         };
         
-        let Game { id, pot, result: _, predict_epoch, report_epoch, game_closed: _, winner_claimed} = game_instance;
+        let Game { id, price: _, pot, result: _, predict_epoch, report_epoch, game_closed: _, winner_claimed} = game_instance;
         object::delete(id);
 
 
@@ -328,8 +333,10 @@ module kiosk_practice::kiosk_practice_two {
 
     // makes a prediction and locks it in the users kiosk and emits an event for the prediction
     // ADD COST THAT GOES TO BALANCE
-    public fun make_prediction(kiosk: &mut Kiosk, kiosk_owner_cap: &KioskOwnerCap, predict: u64, clock: &Clock, _tp: &TransferPolicy<Prediction>, ctx: &mut TxContext)  {
+    public fun make_prediction(game: &mut Game, cost: Coin<SUI>, kiosk: &mut Kiosk, kiosk_owner_cap: &KioskOwnerCap, predict: u64, clock: &Clock, _tp: &TransferPolicy<Prediction>, ctx: &mut TxContext)  {
         
+        assert!(coin::value(&cost) < game.price, EWrongPrice);
+        balance::join(&mut game.pot, coin::into_balance(cost));
         
         event::emit(PredictionMade {
             prediction: option::some(predict),
@@ -395,6 +402,7 @@ module kiosk_practice::kiosk_practice_two {
             id: object::new(ctx),
             tp: transfer_policy,
         };
+
 
         // transfer the publisher, transfer policy cap and game owner cap to the sender and share the registry
         transfer::public_transfer(publisher, tx_context::sender(ctx));
@@ -618,11 +626,10 @@ module kiosk_practice::kiosk_practice_two {
 // ###################################
 
 // only need one value as a + b = 538
-// add transfer policy rules and create the empty_policy function
-// add consts, asserts, and tests
-// add switchboard oracle prototype
-// ptb for making predictions
-// add display for teh prediction
+// tests
+// add variable to pull data from the switchboard prototype
+// ptb for making predictions/ connect to front end
+// add display for the prediction
 
 
 
