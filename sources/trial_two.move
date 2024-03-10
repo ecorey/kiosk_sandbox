@@ -1,5 +1,5 @@
 // ####################################################
-// ###################  OUTLINE ####################
+// ###################  OUTLINE #######################
 // ####################################################
 
 // The structure of the program is as follows:
@@ -51,6 +51,20 @@
 // - test the sender has the game owner cap
 // - test making a prediction
 
+
+
+
+// ####################################################
+// ###################  FLOW ##########################
+// ####################################################
+
+// when the init function is called, it creates the transfer policy and stores it in the regisry which is a shared object
+// and transfers the transfer policy cap and game owner cap to the sender
+// the game owner cap is then used to start the game and close the game
+// the transfer policy is used to enforce a royalty fee when making a prediction
+// the predictions are held and locked in a users kiosk and they can be listed/ delisted, purchased, and burned.
+// the game owner cap is used to close the game and allow the claim the winner function to be called
+// the winner can then claim the pot and the game instance is deleted
 
 // ####################################################
 // ####################################################
@@ -313,6 +327,7 @@ module kiosk_practice::kiosk_practice_two {
 
 
     // makes a prediction and locks it in the users kiosk and emits an event for the prediction
+    // ADD COST THAT GOES TO BALANCE
     public fun make_prediction(kiosk: &mut Kiosk, kiosk_owner_cap: &KioskOwnerCap, predict: u64, clock: &Clock, _tp: &TransferPolicy<Prediction>, ctx: &mut TxContext)  {
         
         
