@@ -131,12 +131,13 @@ module kiosk_practice::kiosk_practice_two {
 
 
     // close the game and allows the report winner function to be called
-    public fun close_game(_: &GameOwnerCap, game_instance: GameInstance, aggregator: &Aggregator, ctx: &mut TxContext) : (Balance<SUI>) {
+    public fun close_game(_: &GameOwnerCap, game_instance: GameInstance, aggregator: &Aggregator, ctx: &mut TxContext) : Balance<SUI> {
         
         assert!(game_instance.predict_epoch.end_time < tx_context::epoch(ctx), EOutsideWindow);
         
-        // let result =  switchboard_oracle::save_aggregator_info(aggregator, ctx);
-        // game_instance.result = option::some(result);
+        switchboard_oracle::save_aggregator_info(aggregator, ctx);
+        // game_instance.result = option::some(result.latest_result);
+
 
         let bal_all = balance::withdraw_all(&mut game_instance.pot);
 
@@ -161,6 +162,28 @@ module kiosk_practice::kiosk_practice_two {
 
     }
 
+
+
+    // claim the winner within timeframe by ref, add event to mark the winner
+    public fun report_winner(prediction: &Prediction, game: &Game, game_instance: &GameInstance, clock: &Clock, ctx: &mut TxContext ) {
+        assert!(clock::timestamp_ms(clock) > game_instance.predict_epoch.start_time, EOutsideWindow);
+        assert!(clock::timestamp_ms(clock) < game_instance.predict_epoch.end_time, EOutsideWindow);
+
+        assert!(clock::timestamp_ms(clock) > game_instance.report_epoch.start_time, EOutsideWindow);
+        assert!(clock::timestamp_ms(clock) < game_instance.report_epoch.end_time, EOutsideWindow);
+
+        assert!(prediction.prediction == game_instance.result, EIncorrectPrediction);
+
+
+        if(prediction.prediction == game_instance.result) {
+            event::emit(Winner {
+                prediction: prediction.prediction,
+                made_by: tx_context::sender(ctx),
+                time: clock::timestamp_ms(clock),
+            });
+        }
+    } 
+    
 
 
     fun set_predict_epoch(start_time: u64, end_time: u64, ctx: &mut TxContext)  {
@@ -188,28 +211,6 @@ module kiosk_practice::kiosk_practice_two {
         transfer::transfer(report_epoch, tx_context::sender(ctx));
 
     }
-
-
-    // claim the winner within timeframe by ref, add event to mark the winner
-    public fun report_winner(prediction: &Prediction, game: &Game, game_instance: &GameInstance, clock: &Clock, ctx: &mut TxContext ) {
-        assert!(clock::timestamp_ms(clock) > game_instance.predict_epoch.start_time, EOutsideWindow);
-        assert!(clock::timestamp_ms(clock) < game_instance.predict_epoch.end_time, EOutsideWindow);
-
-        assert!(clock::timestamp_ms(clock) > game_instance.report_epoch.start_time, EOutsideWindow);
-        assert!(clock::timestamp_ms(clock) < game_instance.report_epoch.end_time, EOutsideWindow);
-
-        assert!(prediction.prediction == game_instance.result, EIncorrectPrediction);
-
-
-        if(prediction.prediction == game_instance.result) {
-            event::emit(Winner {
-                prediction: prediction.prediction,
-                made_by: tx_context::sender(ctx),
-                time: clock::timestamp_ms(clock),
-            });
-        }
-    } 
-
     
 
 
