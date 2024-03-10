@@ -7,7 +7,8 @@
 // 2. PREDICTION LOGIC
 // 3. INIT / TRANSFER POLICY LOGIC
 // 4. KIOSK LOGIC
-// 5. TESTS
+// 5. WITHDRAW FUNCTIONS
+// 6. TESTS
 
 
 // 1) GAME LOGIC
@@ -46,11 +47,18 @@
 // - function to withdraw from the transfer policy
 
 
-// 5) Tests
+
+// 5) WITHDRAW FUNCTIONS
+// - function to withdraw from a personal kiosk
+// - function to withdraw from the transfer policy
+// - function to withdraw from game balance
+
+
+
+// 6) Tests
 // - test the init function
 // - test the sender has the game owner cap
 // - test making a prediction
-
 
 
 
@@ -69,6 +77,8 @@
 // ####################################################
 // ####################################################
 // ####################################################
+
+
 module kiosk_practice::kiosk_practice_two {
 
     use sui::kiosk::{Self, Kiosk, KioskOwnerCap};
@@ -94,8 +104,11 @@ module kiosk_practice::kiosk_practice_two {
     
 
 
-    
-    // errors
+
+    // ########
+    // #ERRORS#
+    // ########
+
     const EOutsideWindow: u64 = 0;
     const EIncorrectPrediction: u64 = 1;
     const EGameNotClosed: u64 = 2;
@@ -307,6 +320,7 @@ module kiosk_practice::kiosk_practice_two {
     
 
 
+
     // ########################################
     // ############PREDICTION LOGIC############
     // ########################################
@@ -497,7 +511,9 @@ module kiosk_practice::kiosk_practice_two {
 
 
     
-
+    // ###################
+    // WITHDRAW FUNCTIONS
+    // ###################
 
     // withdraw from a personal kiosk
     public fun withdraw_balance_from_kiosk(kiosk: &mut Kiosk, kiosk_owner_cap: &KioskOwnerCap, amount: Option<u64>, ctx: &mut TxContext) : Coin<SUI> {
@@ -511,6 +527,12 @@ module kiosk_practice::kiosk_practice_two {
         tp::withdraw(transfer_policy, transfer_policy_cap, amount, ctx)
     }
 
+
+
+    // withdraw from game balance
+    fun withdraw_balance_from_game(_: &GameOwnerCap, game: &mut Game, amount: Option<u64>, ctx: &mut TxContext) : Balance<SUI> {
+        balance::withdraw_all<SUI>(&mut game.pot)
+    }
 
 
 
