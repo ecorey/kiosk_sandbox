@@ -295,7 +295,7 @@ module kiosk_practice::kiosk_practice {
     
 
 
-    fun set_predict_epoch(start_time: u64, end_time: u64, ctx: &mut TxContext) : Epoch {
+    fun set_predict_epoch(start_time: u64, end_time: u64, ctx: &mut TxContext)  {
         
         let predict_epoch  = Epoch {
             id: object::new(ctx),
@@ -303,13 +303,13 @@ module kiosk_practice::kiosk_practice {
             end_time,
         };
 
-        predict_epoch
+        transfer::public_transfer(predict_epoch, tx_context::sender(ctx));
 
     }
 
 
 
-    fun set_report_epoch(start_time: u64, end_time: u64, ctx: &mut TxContext) : Epoch {
+    fun set_report_epoch(start_time: u64, end_time: u64, ctx: &mut TxContext) {
         
         let report_epoch  = Epoch {
             id: object::new(ctx),
@@ -317,7 +317,7 @@ module kiosk_practice::kiosk_practice {
             end_time,
         };
 
-        report_epoch
+        transfer::public_transfer(report_epoch, tx_context::sender(ctx));
 
     }
     
@@ -454,9 +454,11 @@ module kiosk_practice::kiosk_practice {
 
     // creates a new kiosk for a user that can hold the predictions 
     // and returns the kiosk and the kiosk owner cap
-    public fun create_kiosk(ctx: &mut TxContext) : (Kiosk, KioskOwnerCap) {
+    public fun create_kiosk(ctx: &mut TxContext)  {
         let (kiosk, kiosk_owner_cap) = kiosk::new(ctx);
-        (kiosk, kiosk_owner_cap)
+        transfer::public_transfer(kiosk, tx_context::sender(ctx));
+        transfer::public_transfer(kiosk_owner_cap, tx_context::sender(ctx));
+        
     }
 
 
