@@ -4,8 +4,8 @@
 
 // The structure of the program is as follows:
 // 1. GAME LOGIC
-// 2. PREDICTION LOGIC
-// 3. INIT / TRANSFER POLICY LOGIC
+// 2. INIT / TRANSFER POLICY LOGIC
+// 3. PREDICTION LOGIC
 // 4. KIOSK LOGIC
 // 5. WITHDRAW FUNCTIONS
 // 6. TESTS
@@ -24,17 +24,20 @@
 // - funciton to set report epoch
 
 
-// 2) PREDICTION LOGIC
-// - PredictionMade event emitted when a prediction is made
-// - Prediction struct
-// - function to make a prediction and lock it in the users kiosk, also emits an event for the prediction
 
-
-// 3) INIT / TRANSFER POLICY LOGIC
+// 2) INIT / TRANSFER POLICY LOGIC
 // - OTW for the init function4
 // - Registry struct that will hold the transfer policy
 // - function for the init  that creates the transfer policy and stores it in the regisry which is a shared object
 // - function that adds the royalty rule to the transfer policy
+
+
+
+// 3) PREDICTION LOGIC
+// - PredictionMade event emitted when a prediction is made
+// - Prediction struct
+// - function to make a prediction and lock it in the users kiosk, also emits an event for the prediction
+
 
 
 // 4) KIOSK LOGIC
@@ -79,7 +82,7 @@
 // ####################################################
 
 
-module kiosk_practice::kiosk_practice_two {
+module kiosk_practice::kiosk_practice {
 
     use sui::kiosk::{Self, Kiosk, KioskOwnerCap};
     use sui::object::{Self, UID, ID};
@@ -321,6 +324,73 @@ module kiosk_practice::kiosk_practice_two {
 
 
 
+
+    // #####################################################
+    // ############INIT  / TRANSFER POLICY LOGIC############
+    // #####################################################
+
+    // OTW for the init function
+    struct KIOSK_PRACTICE has drop {}
+    
+
+
+    // registry that will hold the transfer policy
+    struct Registry has key, store {
+        id: UID, 
+        tp: TransferPolicy<Prediction>,
+    }
+    
+
+
+    // init creates the transfer policy and stores it in the regisry which is a shared object 
+    // and transfers the transfer policy cap and game owner cap to the sender
+    fun init(otw: KIOSK_PRACTICE, ctx: &mut TxContext) {
+
+        
+
+        let publisher = package::claim(otw, ctx);
+
+
+        let ( transfer_policy, tp_cap ) = tp::new<Prediction>(&publisher, ctx);
+
+
+        // add royality rule to the transfer policy with a 5% royality fee
+        add_royalty_to_policy(&mut transfer_policy, &tp_cap, 005_00);
+
+        // adds tranfer policy to the registry
+        let registry = Registry {
+            id: object::new(ctx),
+            tp: transfer_policy,
+        };
+
+
+        // transfer the publisher, transfer policy cap and game owner cap to the sender and share the registry
+        transfer::public_transfer(publisher, tx_context::sender(ctx));
+        transfer::public_transfer(tp_cap, tx_context::sender(ctx));
+        transfer::public_share_object(registry);
+        
+
+        transfer::transfer(GameOwnerCap {
+            id: object::new(ctx),
+        }, tx_context::sender(ctx));
+
+    }
+
+    
+
+    // adds the royalty rule to the transfer policy
+   public fun add_royalty_to_policy(
+        policy: &mut TransferPolicy<Prediction>,
+        cap: &TransferPolicyCap<Prediction>,
+        amount_bp: u16, 
+    ) {
+        
+        royalty_policy::set<Prediction>(policy, cap, amount_bp);
+    }
+
+
+
+
     // ########################################
     // ############PREDICTION LOGIC############
     // ########################################
@@ -377,76 +447,7 @@ module kiosk_practice::kiosk_practice_two {
 
 
 
-
-
-    // #####################################################
-    // ############INIT  / TRANSFER POLICY LOGIC############
-    // #####################################################
-
-    // OTW for the init function
-    struct KIOSK_PRACTICE_TWO has drop {}
     
-
-
-    // registry that will hold the transfer policy
-    struct Registry has key, store {
-        id: UID, 
-        tp: TransferPolicy<Prediction>,
-    }
-    
-
-
-    // init creates the transfer policy and stores it in the regisry which is a shared object 
-    // and transfers the transfer policy cap and game owner cap to the sender
-    fun init(otw: KIOSK_PRACTICE_TWO, ctx: &mut TxContext) {
-
-        
-
-        let publisher = package::claim(otw, ctx);
-
-
-        let ( transfer_policy, tp_cap ) = tp::new<Prediction>(&publisher, ctx);
-
-
-        // add royality rule to the transfer policy with a 5% royality fee
-        add_royalty_to_policy(&mut transfer_policy, &tp_cap, 005_00);
-
-        // adds tranfer policy to the registry
-        let registry = Registry {
-            id: object::new(ctx),
-            tp: transfer_policy,
-        };
-
-
-        // transfer the publisher, transfer policy cap and game owner cap to the sender and share the registry
-        transfer::public_transfer(publisher, tx_context::sender(ctx));
-        transfer::public_transfer(tp_cap, tx_context::sender(ctx));
-        transfer::public_share_object(registry);
-        
-
-        transfer::transfer(GameOwnerCap {
-            id: object::new(ctx),
-        }, tx_context::sender(ctx));
-
-    }
-
-    
-
-    // adds the royalty rule to the transfer policy
-   public fun add_royalty_to_policy(
-        policy: &mut TransferPolicy<Prediction>,
-        cap: &TransferPolicyCap<Prediction>,
-        amount_bp: u16, 
-    ) {
-        
-        royalty_policy::set<Prediction>(policy, cap, amount_bp);
-    }
-
-
-
-    
-
-
     // ###################################
     // ############KIOSK LOGIC############
     // ###################################
@@ -556,7 +557,7 @@ module kiosk_practice::kiosk_practice_two {
         let scenario = test_scenario::begin(admin);
         let scenario_val = &mut scenario;
 
-        let otw = KIOSK_PRACTICE_TWO {};
+        let otw = KIOSK_PRACTICE {};
 
         // test the init function
         {
