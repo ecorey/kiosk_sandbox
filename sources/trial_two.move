@@ -52,29 +52,25 @@ module kiosk_practice::kiosk_practice_two {
     }
 
 
-
-    // game struct
-    struct Game has key, store {
-        id: UID,
-        balance: Balance<SUI>,
-        coin: String,
-        price: u64, // price to make a prediction, mod the make prediction to have a cost
-        prev_id: Option<ID>,    
-        cur_id: ID,
-        
-
-    }
-
-
-
     // struct to hold a game instance
-    struct GameInstance has key, store {
+    struct Game has key, store {
         id: UID,
         pot: Balance<SUI>, // holds the balance of the game instance, init to zero
         result: Option<u64>,  // will hold the result from the switchboard oracle, initialize to zero / add update function
         predict_epoch: Epoch, // start and end time for predictions
         report_epoch: Epoch, // start and end time for reporting the winner
         
+    }
+
+
+
+    // event emitted when a winner is reported  
+    struct GameStarted has copy, drop {
+        time: u64,
+        predict_start_time: u64,
+        predict_end_time: u64,
+        report_start_time: u64,
+        report_end_time: u64,
     }
 
 
@@ -89,8 +85,8 @@ module kiosk_practice::kiosk_practice_two {
 
 
     // create a new game instance
-    fun new_instance(predict_epoch: Epoch, report_epoch: Epoch, ctx: &mut TxContext) : GameInstance {
-        GameInstance {
+    fun new_game(predict_epoch: Epoch, report_epoch: Epoch, ctx: &mut TxContext) : Game {
+        Game {
             id: object::new(ctx),
             pot: balance::zero<SUI>(),
             result: option::none(),
@@ -101,37 +97,30 @@ module kiosk_practice::kiosk_practice_two {
 
 
 
-    // create a new game
-    fun new_game(instance: &GameInstance, coin: String, price: u64, ctx: &mut TxContext) : Game {
-        Game {
-            id: object::new(ctx),
-            balance: balance::zero<SUI>(),
-            coin,
-            price,
-            prev_id: option::none(),
-            cur_id: object::id(instance),
-        }
-
-    }
-
-
-
     // startst the game and allows predictions to be made
-    public fun start_game(_: &GameOwnerCap, coin: String, price: u64, predict_epoch: Epoch, report_epoch: Epoch, ctx: &mut TxContext)  {
+    public fun start_game(_: &GameOwnerCap, coin: String, price: u64, predict_epoch: Epoch, report_epoch: Epoch, clock: &Clock, ctx: &mut TxContext)  {
 
-        let instance = new_instance(predict_epoch, report_epoch, ctx);
-        let game = new_game(&instance, coin, price, ctx);
+       
+
+        event::emit(GameStarted {
+            time: clock::timestamp_ms(clock),
+            predict_start_time: predict_epoch.start_time,
+            predict_end_time: predict_epoch.end_time,
+            report_start_time: report_epoch.start_time,
+            report_end_time: report_epoch.end_time,
+        });
+
+
+        let game = new_game(predict_epoch, report_epoch, ctx);
         
         transfer::share_object(game);
-        transfer::share_object(instance);
-
-
+        
     }
 
 
-
+    // REDO
     // close the game and allows the report winner function to be called
-    public fun close_game(_: &GameOwnerCap, game_instance: GameInstance, aggregator: &Aggregator, ctx: &mut TxContext) : Balance<SUI> {
+    public fun close_game(_: &GameOwnerCap, game_instance: Game, aggregator: &Aggregator, ctx: &mut TxContext) : Balance<SUI> {
         
         assert!(game_instance.predict_epoch.end_time < tx_context::epoch(ctx), EOutsideWindow);
         
@@ -145,7 +134,7 @@ module kiosk_practice::kiosk_practice_two {
 
         transfer::public_transfer(winning_pot, tx_context::sender(ctx));
 
-        let GameInstance { id, pot, result: _, predict_epoch, report_epoch} = game_instance;
+        let Game { id, pot, result: _, predict_epoch, report_epoch} = game_instance;
         object::delete(id);
 
 
@@ -157,7 +146,6 @@ module kiosk_practice::kiosk_practice_two {
         object::delete(id);
 
         
-        
         (pot)
 
     }
@@ -165,7 +153,7 @@ module kiosk_practice::kiosk_practice_two {
 
 
     // claim the winner within timeframe by ref, add event to mark the winner
-    public fun report_winner(prediction: &Prediction, game: &Game, game_instance: &GameInstance, clock: &Clock, ctx: &mut TxContext ) {
+    public fun report_winner(prediction: &Prediction, game_instance: &Game, clock: &Clock, ctx: &mut TxContext ) {
         assert!(clock::timestamp_ms(clock) > game_instance.predict_epoch.start_time, EOutsideWindow);
         assert!(clock::timestamp_ms(clock) < game_instance.predict_epoch.end_time, EOutsideWindow);
 
