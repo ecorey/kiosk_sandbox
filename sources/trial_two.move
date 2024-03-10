@@ -1,5 +1,61 @@
-module kiosk_practice::kiosk_practice_two {
+// ####################################################
+// ###################  OUTLINE ####################
+// ####################################################
 
+// The structure of the program is as follows:
+// 1. GAME LOGIC
+// 2. PREDICTION LOGIC
+// 3. INIT / TRANSFER POLICY LOGIC
+// 4. KIOSK LOGIC
+// 5. TESTS
+
+
+// 1) GAME LOGIC
+// - struct to hold game times
+// - game owner cap that goes to sender of the init function
+// - struct to hold a game instance
+// - event emitted when a winner is reported
+// - event emitted when a winner is reported
+// - create a new game instance
+// - start the game and allows predictions to be made
+// - close the game/ sets the result and allows the report winner function to be called
+// - claim the winner within timeframe by ref, add event to mark the winner
+// - set predict epoch
+// - set report epoch
+
+
+// 2) PREDICTION LOGIC
+// - event emitted when a prediction is made
+// - the prediction struct
+// - makes a prediction and locks it in the users kiosk and emits an event for the prediction
+
+
+// 3) INIT / TRANSFER POLICY LOGIC
+// - OTW for the init function4
+// - registry that will hold the transfer policy
+// - init creates the transfer policy and stores it in the regisry which is a shared object
+// - adds the royalty rule to the transfer policy
+
+// 4) KIOSK LOGIC
+// - creates a new kiosk for a user that can hold the predictions
+// - burns the prediction from the kiosk and deletes the prediction
+// - lists the prediction in the kiosk for sale
+// - delists the prediction from the kiosk
+// - purchase a prediction from another user
+// - withdraw from a personal kiosk
+// - withdraw from the transfer policy
+
+
+// 5) Tests
+// - test the init function
+// - test the sender has the game owner cap
+// - test making a prediction
+
+
+// ####################################################
+// ####################################################
+// ####################################################
+module kiosk_practice::kiosk_practice_two {
 
     use sui::kiosk::{Self, Kiosk, KioskOwnerCap};
     use sui::object::{Self, UID, ID};
