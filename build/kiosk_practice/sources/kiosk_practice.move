@@ -190,9 +190,10 @@ module kiosk_practice::kiosk_practice {
     }
 
 
+  
 
     // startst the game and allows predictions to be made
-    public fun start_game(_: &GameOwnerCap, coin: String, price: u64, predict_epoch: Epoch, report_epoch: Epoch, clock: &Clock, ctx: &mut TxContext)  {
+    public fun start_game(_: &GameOwnerCap, price: u64, predict_epoch: Epoch, report_epoch: Epoch, clock: &Clock, ctx: &mut TxContext)  {
 
        
 
