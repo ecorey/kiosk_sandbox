@@ -18,6 +18,9 @@ module kiosk_practice::kiosk_practice_two {
     use sui::clock::{Self, Clock};
 
     use kiosk_practice::royalty_policy;
+
+    use kiosk_practice::switchboard_oracle::{Self, AggregatorInfo};
+    use switchboard::aggregator::{Self, Aggregator};
     
 
 
@@ -128,7 +131,33 @@ module kiosk_practice::kiosk_practice_two {
 
 
     // close the game and allows the report winner function to be called
-    public fun close_game() {
+    public fun close_game(_: &GameOwnerCap, game_instance: GameInstance, aggregator: &Aggregator, ctx: &mut TxContext) : (Balance<SUI>) {
+        
+        assert!(game_instance.predict_epoch.end_time < tx_context::epoch(ctx), EOutsideWindow);
+        
+        // let result =  switchboard_oracle::save_aggregator_info(aggregator, ctx);
+        // game_instance.result = option::some(result);
+
+        let bal_all = balance::withdraw_all(&mut game_instance.pot);
+
+        let winning_pot = coin::from_balance(bal_all, ctx);
+
+        transfer::public_transfer(winning_pot, tx_context::sender(ctx));
+
+        let GameInstance { id, pot, result: _, predict_epoch, report_epoch} = game_instance;
+        object::delete(id);
+
+
+        let Epoch { id, start_time: _, end_time: _} = predict_epoch;
+        object::delete(id);
+
+
+        let Epoch { id, start_time: _, end_time: _} = report_epoch;
+        object::delete(id);
+
+        
+        
+        (pot)
 
     }
 
