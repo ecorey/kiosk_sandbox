@@ -7,14 +7,14 @@ compiled_package_info:
     sui: "0000000000000000000000000000000000000000000000000000000000000002"
     switchboard: 98670585b87e06628ef2d7f7cb1e7bee8ada65b43b82997935225a7e6e21d18e
     switchboard_std: 98670585b87e06628ef2d7f7cb1e7bee8ada65b43b82997935225a7e6e21d18e
-  source_digest: A7E15DE98CCEC3C9F7E5D9F08B79690AD37A5A7A8060DC3BCDCAF40639F9C5B1
+  source_digest: E39D44B9D635BC2F63633319249FD915870EA41BDC000B2B3E9E17CEDDE0F195
   build_flags:
-    dev_mode: true
-    test_mode: true
+    dev_mode: false
+    test_mode: false
     generate_docs: false
     install_dir: ~
     force_recompilation: false
-    lock_file: ~
+    lock_file: "./Move.lock"
     fetch_deps_only: false
     skip_fetch_latest_git_deps: false
     default_flavor: sui

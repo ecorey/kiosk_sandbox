@@ -67,7 +67,7 @@ module kiosk_practice::kiosk_practice_two {
     // struct to hold a game instance
     struct GameInstance has key, store {
         id: UID,
-        balance: Balance<SUI>, // holds the balance of the game instance, init to zero
+        pot: Balance<SUI>, // holds the balance of the game instance, init to zero
         result: Option<u64>,  // will hold the result from the switchboard oracle, initialize to zero / add update function
         predict_epoch: Epoch, // start and end time for predictions
         report_epoch: Epoch, // start and end time for reporting the winner
@@ -80,6 +80,7 @@ module kiosk_practice::kiosk_practice_two {
     struct Winner has copy, drop {
         prediction: Option<u64>,
         made_by: address,
+        time: u64,
     }
 
 
@@ -88,7 +89,7 @@ module kiosk_practice::kiosk_practice_two {
     fun new_instance(predict_epoch: Epoch, report_epoch: Epoch, ctx: &mut TxContext) : GameInstance {
         GameInstance {
             id: object::new(ctx),
-            balance: balance::zero<SUI>(),
+            pot: balance::zero<SUI>(),
             result: option::none(),
             predict_epoch,
             report_epoch,
@@ -161,7 +162,7 @@ module kiosk_practice::kiosk_practice_two {
 
 
     // claim the winner within timeframe by ref, add event to mark the winner
-    public fun report_winner(prediction: &Prediction, game: &Game, game_instance: &GameInstance, clock: &Clock ) {
+    public fun report_winner(prediction: &Prediction, game: &Game, game_instance: &GameInstance, clock: &Clock, ctx: &mut TxContext ) {
         assert!(clock::timestamp_ms(clock) > game_instance.predict_epoch.start_time, EOutsideWindow);
         assert!(clock::timestamp_ms(clock) < game_instance.predict_epoch.end_time, EOutsideWindow);
 
@@ -173,8 +174,9 @@ module kiosk_practice::kiosk_practice_two {
 
         if(prediction.prediction == game_instance.result) {
             event::emit(Winner {
-                winner: tx_context::sender(ctx),
                 prediction: prediction.prediction,
+                made_by: tx_context::sender(ctx),
+                time: clock::timestamp_ms(clock),
             });
         }
     } 
@@ -371,14 +373,14 @@ module kiosk_practice::kiosk_practice_two {
 
 
     // withdraw from a personal kiosk
-    public fun withdraw_from_kiosk(kiosk: &mut Kiosk, kiosk_owner_cap: &KioskOwnerCap, amount: Option<u64>, ctx: &mut TxContext) : Coin<SUI> {
+    public fun withdraw_balance_from_kiosk(kiosk: &mut Kiosk, kiosk_owner_cap: &KioskOwnerCap, amount: Option<u64>, ctx: &mut TxContext) : Coin<SUI> {
         kiosk::withdraw(kiosk, kiosk_owner_cap, amount, ctx)
     }
 
 
 
     // withdraw from the transfer policy
-    public fun withdraw_from_tranfer_policy( transfer_policy: &mut TransferPolicy<Prediction>, transfer_policy_cap: &TransferPolicyCap<Prediction>, amount: Option<u64>, ctx: &mut TxContext ) : Coin<SUI> {
+    public fun withdraw_balance_from_tranfer_policy( transfer_policy: &mut TransferPolicy<Prediction>, transfer_policy_cap: &TransferPolicyCap<Prediction>, amount: Option<u64>, ctx: &mut TxContext ) : Coin<SUI> {
         tp::withdraw(transfer_policy, transfer_policy_cap, amount, ctx)
     }
 
