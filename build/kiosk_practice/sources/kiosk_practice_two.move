@@ -174,7 +174,7 @@ module kiosk_practice::kiosk_practice_two {
     
 
 
-    fun set_predict_epoch(start_time: u64, end_time: u64, ctx: &mut TxContext)  {
+    fun set_predict_epoch(start_time: u64, end_time: u64, ctx: &mut TxContext) : Epoch {
         
         let predict_epoch  = Epoch {
             id: object::new(ctx),
@@ -182,13 +182,13 @@ module kiosk_practice::kiosk_practice_two {
             end_time,
         };
 
-        transfer::transfer(predict_epoch, tx_context::sender(ctx));
+        predict_epoch
 
     }
 
 
 
-    fun set_report_epoch(start_time: u64, end_time: u64, ctx: &mut TxContext) {
+    fun set_report_epoch(start_time: u64, end_time: u64, ctx: &mut TxContext) : Epoch {
         
         let report_epoch  = Epoch {
             id: object::new(ctx),
@@ -196,7 +196,7 @@ module kiosk_practice::kiosk_practice_two {
             end_time,
         };
 
-        transfer::transfer(report_epoch, tx_context::sender(ctx));
+        report_epoch
 
     }
     
