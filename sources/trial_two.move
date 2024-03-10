@@ -11,39 +11,39 @@
 
 
 // 1) GAME LOGIC
-// - struct to hold game times
-// - game owner cap that goes to sender of the init function
-// - struct to hold a game instance
-// - event emitted when a winner is reported
-// - event emitted when a winner is reported
-// - create a new game instance
-// - start the game and allows predictions to be made
-// - close the game/ sets the result and allows the report winner function to be called
-// - claim the winner within timeframe by ref, add event to mark the winner
-// - set predict epoch
-// - set report epoch
+// - EPOCH struct to hold game times
+// - GameOwnerCap that goes to sender of the init function
+// - Game struct to hold a game instance
+// - Winner event emitted when a winner is claimed
+// - function to create a new game instance
+// - function to start the game and allows predictions to be made
+// - function to close the game/ sets the result and allows the report winner function to be called
+// - function to claim the winner within timeframe by ref, add event to mark the winner
+// - function to set predict epoch
+// - funciton to set report epoch
 
 
 // 2) PREDICTION LOGIC
-// - event emitted when a prediction is made
-// - the prediction struct
-// - makes a prediction and locks it in the users kiosk and emits an event for the prediction
+// - PredictionMade event emitted when a prediction is made
+// - Prediction struct
+// - function to make a prediction and lock it in the users kiosk, also emits an event for the prediction
 
 
 // 3) INIT / TRANSFER POLICY LOGIC
 // - OTW for the init function4
-// - registry that will hold the transfer policy
-// - init creates the transfer policy and stores it in the regisry which is a shared object
-// - adds the royalty rule to the transfer policy
+// - Registry struct that will hold the transfer policy
+// - function for the init  that creates the transfer policy and stores it in the regisry which is a shared object
+// - function that adds the royalty rule to the transfer policy
+
 
 // 4) KIOSK LOGIC
-// - creates a new kiosk for a user that can hold the predictions
-// - burns the prediction from the kiosk and deletes the prediction
-// - lists the prediction in the kiosk for sale
-// - delists the prediction from the kiosk
-// - purchase a prediction from another user
-// - withdraw from a personal kiosk
-// - withdraw from the transfer policy
+// - function that creates a new kiosk for a user that can hold the predictions
+// - function that burns the prediction from the kiosk and deletes the prediction
+// - function that lists the prediction in the kiosk for sale
+// - functioin that delists the prediction from the kiosk
+// - function to purchase a prediction from another user
+// - funciton to withdraw from a personal kiosk
+// - function to withdraw from the transfer policy
 
 
 // 5) Tests
