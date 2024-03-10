@@ -29,7 +29,7 @@ module kiosk_practice::kiosk_practice_two {
     const EOutsideWindow: u64 = 0;
     const EIncorrectPrediction: u64 = 1;
 
-    
+
 
 
     // ##################################
@@ -59,6 +59,7 @@ module kiosk_practice::kiosk_practice_two {
         result: Option<u64>,  // will hold the result from the switchboard oracle, initialize to zero / add update function
         predict_epoch: Epoch, // start and end time for predictions
         report_epoch: Epoch, // start and end time for reporting the winner
+        winner_claimed: bool, // bool to check if the winner has claimed the pot
         
     }
 
@@ -92,6 +93,7 @@ module kiosk_practice::kiosk_practice_two {
             result: option::none(),
             predict_epoch,
             report_epoch,
+            winner_claimed: false,
         }
     }
 
@@ -127,14 +129,14 @@ module kiosk_practice::kiosk_practice_two {
         switchboard_oracle::save_aggregator_info(aggregator, ctx);
         // game_instance.result = option::some(result.latest_result);
 
-
+       
         let bal_all = balance::withdraw_all(&mut game_instance.pot);
 
         let winning_pot = coin::from_balance(bal_all, ctx);
 
         transfer::public_transfer(winning_pot, tx_context::sender(ctx));
 
-        let Game { id, pot, result: _, predict_epoch, report_epoch} = game_instance;
+        let Game { id, pot, result: _, predict_epoch, report_epoch, winner_claimed: _} = game_instance;
         object::delete(id);
 
 
@@ -152,8 +154,9 @@ module kiosk_practice::kiosk_practice_two {
 
 
 
+
     // claim the winner within timeframe by ref, add event to mark the winner
-    public fun claim_winner(prediction: &Prediction, game_instance: &Game, clock: &Clock, ctx: &mut TxContext ) : (bool, address) {
+    public fun claim_winner(prediction: &Prediction, game_instance: Game, clock: &Clock, ctx: &mut TxContext ) : (bool, address, Balance<SUI>, bool) {
         assert!(clock::timestamp_ms(clock) > game_instance.predict_epoch.start_time, EOutsideWindow);
         assert!(clock::timestamp_ms(clock) < game_instance.predict_epoch.end_time, EOutsideWindow);
 
@@ -179,7 +182,32 @@ module kiosk_practice::kiosk_practice_two {
             let bool_val = false;
         };
 
-        (bool_val, tx_context::sender(ctx))
+        
+        if(prediction.prediction == game_instance.result) {
+
+            game_instance.winner_claimed = true;
+           
+            let bal_all = balance::withdraw_all(&mut game_instance.pot);
+
+            let winning_pot = coin::from_balance(bal_all, ctx);
+
+            transfer::public_transfer(winning_pot, tx_context::sender(ctx));
+        };
+        
+        let Game { id, pot, result: _, predict_epoch, report_epoch, winner_claimed} = game_instance;
+        object::delete(id);
+
+
+        let Epoch { id, start_time: _, end_time: _} = predict_epoch;
+        object::delete(id);
+
+
+        let Epoch { id, start_time: _, end_time: _} = report_epoch;
+        object::delete(id);
+
+
+
+        (bool_val, tx_context::sender(ctx), pot, winner_claimed)
 
 
     } 
