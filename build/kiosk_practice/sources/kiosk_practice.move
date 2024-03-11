@@ -253,7 +253,7 @@ module kiosk_practice::kiosk_practice {
 
 
     // claim the winner within timeframe by ref, add event to mark the winner
-    public fun claim_winner(prediction: &Prediction, game_instance: Game, clock: &Clock, ctx: &mut TxContext ) : (bool, address, Balance<SUI>, bool) {
+    public fun claim_winner(prediction: Prediction, game_instance: Game, clock: &Clock, ctx: &mut TxContext ) : (bool, address, Balance<SUI>, bool) {
         
         assert!(game_instance.game_closed, EGameNotClosed);
 
@@ -305,6 +305,9 @@ module kiosk_practice::kiosk_practice {
 
 
         let Epoch { id, start_time: _, end_time: _} = report_epoch;
+        object::delete(id);
+
+        let Prediction {id, prediction_id: _, prediction: _, timestamp: _} = prediction;
         object::delete(id);
 
 
