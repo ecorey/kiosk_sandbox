@@ -319,7 +319,19 @@ module kiosk_practice::kiosk_practice {
     
 
     // CHANGE TO TIMESTAMPS
-    public fun set_predict_epoch(start_time: u64, end_time: u64, ctx: &mut TxContext)  {
+    // public fun set_predict_epoch(start_time: u64, end_time: u64, ctx: &mut TxContext)  {
+        
+    //     let predict_epoch  = Epoch {
+    //         id: object::new(ctx),
+    //         start_time,
+    //         end_time,
+    //     };
+
+    //     transfer::public_transfer(predict_epoch, tx_context::sender(ctx));
+
+    // }
+
+     public fun set_predict_epoch(start_time: u64, end_time: u64, ctx: &mut TxContext) : Epoch  {
         
         let predict_epoch  = Epoch {
             id: object::new(ctx),
@@ -327,13 +339,26 @@ module kiosk_practice::kiosk_practice {
             end_time,
         };
 
-        transfer::public_transfer(predict_epoch, tx_context::sender(ctx));
+        predict_epoch
 
     }
 
 
     // CHANGE TO TIMESTAMPS
-    public fun set_report_epoch(start_time: u64, end_time: u64, ctx: &mut TxContext) {
+    // public fun set_report_epoch(start_time: u64, end_time: u64, ctx: &mut TxContext) {
+        
+    //     let report_epoch  = Epoch {
+    //         id: object::new(ctx),
+    //         start_time,
+    //         end_time,
+    //     };
+
+    //     transfer::public_transfer(report_epoch, tx_context::sender(ctx));
+
+    // }
+
+
+     public fun set_report_epoch(start_time: u64, end_time: u64, ctx: &mut TxContext) : Epoch {
         
         let report_epoch  = Epoch {
             id: object::new(ctx),
@@ -341,7 +366,7 @@ module kiosk_practice::kiosk_practice {
             end_time,
         };
 
-        transfer::public_transfer(report_epoch, tx_context::sender(ctx));
+        report_epoch
 
     }
     
@@ -450,6 +475,7 @@ module kiosk_practice::kiosk_practice {
 
 
         assert!(coin::value(&cost) < game.price, EWrongPrice);
+
         balance::join(&mut game.pot, coin::into_balance(cost));
         
         event::emit(PredictionMade {
@@ -485,13 +511,19 @@ module kiosk_practice::kiosk_practice {
 
     // creates a new kiosk for a user that can hold the predictions 
     // and returns the kiosk and the kiosk owner cap
-    public fun create_kiosk(ctx: &mut TxContext)  {
+    
+    // public fun create_kiosk(ctx: &mut TxContext)  {
+    //     let (kiosk, kiosk_owner_cap) = kiosk::new(ctx);
+    //     transfer::public_transfer(kiosk, tx_context::sender(ctx));
+    //     transfer::public_transfer(kiosk_owner_cap, tx_context::sender(ctx));
+        
+    // }
+
+      public fun create_kiosk(ctx: &mut TxContext)  : (Kiosk, KioskOwnerCap) {
         let (kiosk, kiosk_owner_cap) = kiosk::new(ctx);
-        transfer::public_transfer(kiosk, tx_context::sender(ctx));
-        transfer::public_transfer(kiosk_owner_cap, tx_context::sender(ctx));
+        (kiosk, kiosk_owner_cap)
         
     }
-
 
 
     // burns the prediction from the kiosk and deletes the prediction
