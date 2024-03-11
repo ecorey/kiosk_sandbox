@@ -136,9 +136,22 @@ module kiosk_practice::kiosk_practice {
 
 
     // game owner cap that goes to sender of the init function
-    struct GameOwnerCap has key {
+     struct GameOwnerCap has key {
         id: UID,
     }
+
+    
+    
+    struct StartGameCap has key {
+        id: UID,
+    }
+
+
+
+    struct EndGameCap has key {
+        id: UID,
+    }
+
 
 
     // struct to hold a game instance
@@ -194,7 +207,7 @@ module kiosk_practice::kiosk_practice {
   
 
     // startst the game and allows predictions to be made
-    public fun start_game(_: &GameOwnerCap, price: u64, predict_epoch: Epoch, report_epoch: Epoch, clock: &Clock, ctx: &mut TxContext)  {
+    public fun start_game(start_game_cap: StartGameCap, price: u64, predict_epoch: Epoch, report_epoch: Epoch, clock: &Clock, ctx: &mut TxContext)  {
 
        
 
@@ -210,18 +223,24 @@ module kiosk_practice::kiosk_practice {
         let game = new_game(price, predict_epoch, report_epoch, ctx);
         
         transfer::share_object(game);
+
+        let StartGameCap { id } = start_game_cap;
+        object::delete(id);
         
     }
 
 
     // REDO
     // close the game/ sets the result and allows the report winner function to be called
-    public fun close_game(_: &GameOwnerCap, game_instance: &mut Game, aggregator: &Aggregator, ctx: &mut TxContext) : bool {
+    public fun close_game(end_game_cap: EndGameCap, game_instance: &mut Game, aggregator: &Aggregator, ctx: &mut TxContext) : bool {
         
         assert!(game_instance.predict_epoch.end_time < tx_context::epoch(ctx), EOutsideWindow);
         game_instance.game_closed = true;
         
         switchboard_oracle::save_aggregator_info(aggregator, ctx);
+
+        let EndGameCap { id } = end_game_cap;
+        object::delete(id);
 
         // ORACLE logic to save the data to the game instance' result field
         // game_instance.result = option::some(result.latest_result);
@@ -362,6 +381,16 @@ module kiosk_practice::kiosk_practice {
         
 
         transfer::transfer(GameOwnerCap {
+            id: object::new(ctx),
+        }, tx_context::sender(ctx));
+
+
+        transfer::transfer(StartGameCap {
+            id: object::new(ctx),
+        }, tx_context::sender(ctx));
+
+
+        transfer::transfer(EndGameCap {
             id: object::new(ctx),
         }, tx_context::sender(ctx));
 
