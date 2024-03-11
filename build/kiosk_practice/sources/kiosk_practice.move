@@ -99,6 +99,7 @@ module kiosk_practice::kiosk_practice {
     use sui::table::Table;
     use sui::coin::{Self, Coin};    
     use sui::clock::{Self, Clock};
+    use sui::borrow::{Self, Borrow};
 
     use kiosk_practice::royalty_policy;
 
@@ -295,8 +296,8 @@ module kiosk_practice::kiosk_practice {
     } 
     
 
-
-    fun set_predict_epoch(start_time: u64, end_time: u64, ctx: &mut TxContext)  {
+    // CHANGE TO TIMESTAMPS
+    public fun set_predict_epoch(start_time: u64, end_time: u64, ctx: &mut TxContext)  {
         
         let predict_epoch  = Epoch {
             id: object::new(ctx),
@@ -309,8 +310,8 @@ module kiosk_practice::kiosk_practice {
     }
 
 
-
-    fun set_report_epoch(start_time: u64, end_time: u64, ctx: &mut TxContext) {
+    // CHANGE TO TIMESTAMPS
+    public fun set_report_epoch(start_time: u64, end_time: u64, ctx: &mut TxContext) {
         
         let report_epoch  = Epoch {
             id: object::new(ctx),
@@ -335,14 +336,6 @@ module kiosk_practice::kiosk_practice {
     
 
 
-    // registry that will hold the transfer policy
-    struct Registry has key, store {
-        id: UID, 
-        tp: TransferPolicy<Prediction>,
-    }
-    
-
-
     // init creates the transfer policy and stores it in the regisry which is a shared object 
     // and transfers the transfer policy cap and game owner cap to the sender
     fun init(otw: KIOSK_PRACTICE, ctx: &mut TxContext) {
@@ -358,17 +351,14 @@ module kiosk_practice::kiosk_practice {
         // add royality rule to the transfer policy with a 5% royality fee
         add_royalty_to_policy(&mut transfer_policy, &tp_cap, 005_00);
 
-        // adds tranfer policy to the registry
-        let registry = Registry {
-            id: object::new(ctx),
-            tp: transfer_policy,
-        };
+
+        
 
 
         // transfer the publisher, transfer policy cap and game owner cap to the sender and share the registry
         transfer::public_transfer(publisher, tx_context::sender(ctx));
         transfer::public_transfer(tp_cap, tx_context::sender(ctx));
-        transfer::public_share_object(registry);
+        transfer::public_share_object(transfer_policy);
         
 
         transfer::transfer(GameOwnerCap {
@@ -388,6 +378,8 @@ module kiosk_practice::kiosk_practice {
         
         royalty_policy::set<Prediction>(policy, cap, amount_bp);
     }
+
+
 
 
 
@@ -414,12 +406,17 @@ module kiosk_practice::kiosk_practice {
         
     }
 
+   
 
 
     // makes a prediction and locks it in the users kiosk and emits an event for the prediction
     // ADD COST THAT GOES TO BALANCE
-    public fun make_prediction(game: &mut Game, cost: Coin<SUI>, kiosk: &mut Kiosk, kiosk_owner_cap: &KioskOwnerCap, predict: u64, clock: &Clock, _tp: &TransferPolicy<Prediction>, ctx: &mut TxContext)  {
+    public fun make_prediction(game: &mut Game, _tp: &TransferPolicy<Prediction>, cost: Coin<SUI>, kiosk: &mut Kiosk, kiosk_owner_cap: &KioskOwnerCap,  predict: u64, clock: &Clock, ctx: &mut TxContext)  {
         
+        
+
+
+
         assert!(coin::value(&cost) < game.price, EWrongPrice);
         balance::join(&mut game.pot, coin::into_balance(cost));
         
@@ -444,6 +441,7 @@ module kiosk_practice::kiosk_practice {
        
 
         
+
     }
 
 
@@ -465,11 +463,11 @@ module kiosk_practice::kiosk_practice {
 
 
     // burns the prediction from the kiosk and deletes the prediction
-    public fun burn_from_kiosk( kiosk: &mut Kiosk, kiosk_cap: &KioskOwnerCap, prediction_id: ID, registry: &mut Registry, ctx: &mut TxContext) {
+    public fun burn_from_kiosk( kiosk: &mut Kiosk, kiosk_cap: &KioskOwnerCap, prediction_id: ID, tp: &TransferPolicy<Prediction>, ctx: &mut TxContext) {
 
         let purchase_cap = kiosk::list_with_purchase_cap<Prediction>( kiosk, kiosk_cap, prediction_id, 0, ctx); 
         let ( prediction, transfer_request)  = kiosk::purchase_with_cap<Prediction>(kiosk, purchase_cap, coin::zero<SUI>(ctx));
-        tp::confirm_request<Prediction>( &registry.tp, transfer_request  );
+        tp::confirm_request<Prediction>( tp, transfer_request  );
 
         let Prediction {id, prediction_id: _, prediction: _, timestamp: _} = prediction;
         object::delete(id);
