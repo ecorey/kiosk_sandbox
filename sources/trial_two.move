@@ -382,6 +382,11 @@ module kiosk_practice::kiosk_practice {
     struct KIOSK_PRACTICE has drop {}
     
 
+    // event that is emitted when the init function is called and gives the time
+    struct InitEvent has copy, drop {
+        tx_epoch: u64,
+    }
+
 
     // init creates the transfer policy and stores it in the regisry which is a shared object 
     // and transfers the transfer policy cap and game owner cap to the sender
@@ -421,6 +426,13 @@ module kiosk_practice::kiosk_practice {
         transfer::transfer(EndGameCap {
             id: object::new(ctx),
         }, tx_context::sender(ctx));
+
+
+
+        event::emit(InitEvent {
+            tx_epoch: tx_context::epoch(ctx),
+        });
+
 
     }
 
@@ -511,7 +523,7 @@ module kiosk_practice::kiosk_practice {
 
     // creates a new kiosk for a user that can hold the predictions 
     // and returns the kiosk and the kiosk owner cap
-    
+
     // public fun create_kiosk(ctx: &mut TxContext)  {
     //     let (kiosk, kiosk_owner_cap) = kiosk::new(ctx);
     //     transfer::public_transfer(kiosk, tx_context::sender(ctx));

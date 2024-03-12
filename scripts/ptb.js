@@ -1,6 +1,8 @@
 import { SuiClient, getFullnodeUrl } from '@mysten/sui.js/client';
 import { TransactionBlock } from '@mysten/sui.js/transactions';
 import { MIST_PER_SUI } from '@mysten/sui.js/utils';
+import { JsonRpcProvider, testnetConnection } from '@mysten/sui.js';
+
 
 
 
@@ -11,9 +13,11 @@ const txb = new TransactionBlock();
 
 
 const ADDRESS_User = '0x6060640454e670a0efb91c896a7ee4f3d5781c9b489f9962640873d1f2b8c961';
+const PACKAGE_ID = '0xaafa4058de49a7fb79d450c61e33ee03033c7c21634b24b73e0bf2a021798725'
 
 
 
+const MoveEventType = '{PACKAGE_ID}>::kiosk_practice::<METHOD_NAME>';
 
 
 const balance = (balance) => {
@@ -30,6 +34,15 @@ const acctBalance = await suiClient.getBalance({
 const [coin] = txb.splitCoins(txb.gas, [10000000]);
 
 
+
+
+// subscrbe to events for the package
+let unsubscribe = await provider.subscribeEvent({
+    filter: { PACKAGE_ID },
+    onMessage: (event) => {
+        console.log("subscribeEvent", JSON.stringify(event, null, 2))
+    }
+});
 
 // // call the set_predict_epoch function in the kiosk_practice contract
 // const [kiosk, kiosk_owner_cap] = txb.moveCall({
@@ -64,5 +77,5 @@ const predict_epoch = txb.moveCall({
 
 
 console.log(
-    `prediction made by ${ balance(acctBalance) }`
+    `acct balance: ${ balance(acctBalance) }`
 )
