@@ -25,10 +25,42 @@ const acctBalance = await suiClient.getBalance({
 });
 
 
-// txb.moveCall({
-//     target: '0x0::predictrix::make_prediction',
-//     arguments: [ ],
+
+// create coin object that is equalt to the cost of a prediction
+const [coin] = txb.splitCoins(txb.gas, [10000000]);
+
+
+
+// // call the set_predict_epoch function in the kiosk_practice contract
+// const [kiosk, kiosk_owner_cap] = txb.moveCall({
+//     target: '0xaafa4058de49a7fb79d450c61e33ee03033c7c21634b24b73e0bf2a021798725::kiosk_practice::create_kiosk',
+//     arguments: [],
 // });
+
+
+
+// call the set_predict_epoch function in the kiosk_practice contract
+const predict_epoch = txb.moveCall({
+    target: '0xaafa4058de49a7fb79d450c61e33ee03033c7c21634b24b73e0bf2a021798725::kiosk_practice::set_predict_epoch',
+    arguments: [ 2, 555 ],
+});
+
+
+
+// // call the set_report_epoch function in the kiosk_practice contract
+// const report_epoch = txb.moveCall({
+//     target: '0xaafa4058de49a7fb79d450c61e33ee03033c7c21634b24b73e0bf2a021798725::kiosk_practice::set_report_epoch',
+//     arguments: [ 555, 777 ],
+// });
+
+
+
+// // call the set_report_epoch function in the kiosk_practice contract
+// const game = txb.moveCall({
+//     target: '0xaafa4058de49a7fb79d450c61e33ee03033c7c21634b24b73e0bf2a021798725::kiosk_practice::start_game',
+//     arguments: [ 555, 777 ],
+// });
+
 
 
 console.log(
