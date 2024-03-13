@@ -3,6 +3,7 @@ import { Ed25519Keypair } from '@mysten/sui.js/keypairs/ed25519';
 import dotenv from 'dotenv';
 
 
+
 export const keypair = Ed25519Keypair.fromSecretKey(Uint8Array.from(Buffer.from(process.env.KEY, "base64")).slice(1));
 // const keypair = Ed25519Keypair.fromSecretKey(process.env.KEY);
 

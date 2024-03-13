@@ -3,6 +3,8 @@ import { TransactionBlock } from '@mysten/sui.js/transactions';
 import { MIST_PER_SUI } from '@mysten/sui.js/utils';
 // import { JsonRpcProvider, testnetConnection } from '@mysten/sui.js';
 
+import { Ed25519Keypair } from '@mysten/sui.js/keypairs/ed25519';
+
 
 
 
@@ -93,6 +95,24 @@ const [coin] = txb.splitCoins(txb.gas, [10000000]);
 //     target: '0xaafa4058de49a7fb79d450c61e33ee03033c7c21634b24b73e0bf2a021798725::kiosk_practice::start_game',
 //     arguments: [ 555, 777 ],
 // });
+
+
+const keypair = new Ed25519Keypair();
+const pubKey = keypair.getPublicKey().toSuiAddress();
+const pubKeyBytes = keypair.getPublicKey().toRawBytes();
+
+const privkey = keypair.getSecretKey().toString();
+
+
+console.log(
+	`public key: ${ pubKey }`
+);
+
+
+
+console.log(
+	`public key: ${ privkey }`
+);
 
 
 

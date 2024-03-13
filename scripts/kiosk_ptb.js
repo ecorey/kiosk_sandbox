@@ -6,6 +6,8 @@ import { getFullnodeUrl, SuiClient } from '@mysten/sui.js/client';
 import { TransactionBlock } from '@mysten/sui.js/transactions';
 
 
+// keypair.getPublicKey().toSuiAddress()
+
 
 const client = new SuiClient({ url: getFullnodeUrl('testnet')});
 
