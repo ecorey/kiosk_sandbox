@@ -11,6 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "@mysten/kiosk": "^0.8.4",
-    "@mysten/sui.js": "^0.50.1"
+    "@mysten/sui.js": "^0.50.1",
+    "dotenv": "^16.4.5"
   }
 }
