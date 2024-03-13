@@ -59,6 +59,10 @@ kioskTx.create();
 
 
 
+kioskTx.withdraw({
+    address: '0x6060640454e670a0efb91c896a7ee4f3d5781c9b489f9962640873d1f2b8c961',
+    amount
+}).finalize();
 
 
 
