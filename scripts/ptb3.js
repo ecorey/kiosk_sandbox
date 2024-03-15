@@ -59,8 +59,17 @@ const kioskClient = new KioskClient({
 
 
 // function to get the kiosk owner cap
-const getCap = async () => {
+const getCapWalletDev = async () => {
     let { kioskOwnerCaps } = await kioskClient.getOwnedKiosks(keypairdev.getPublicKey().toRawBytes());
+    // Assume that the user has only 1 kiosk.
+    // Here, you need to do some more checks in a realistic scenario.
+    // And possibly give the user in our dApp a kiosk selector to choose which one they want to interact with (if they own more than one).
+    return kioskOwnerCaps[0];
+}
+
+
+const getCapWalletOne = async () => {
+    let { kioskOwnerCaps } = await kioskClient.getOwnedKiosks(keypairWalletOne.getPublicKey().toRawBytes());
     // Assume that the user has only 1 kiosk.
     // Here, you need to do some more checks in a realistic scenario.
     // And possibly give the user in our dApp a kiosk selector to choose which one they want to interact with (if they own more than one).
@@ -78,19 +87,64 @@ const getCap = async () => {
         const txb = new TransactionBlock();
         
 
-       
+        // dev wallet starts game
+        const predict_start_time = 22;
+        const predict_end_time = 555;
 
-       
+        const report_start_time = 555;
+        const report_end_time = 777;
+        
+
+
+
+        // make a predict epoch (works)
+        const predict_epoch = txb.moveCall({
+            target: '0xa5e20fbc457babd65e5d1927d7d20451a6681e3ae0751703dfea0da129f5e33e::kiosk_practice::set_predict_epoch',
+            arguments: [ txb.pure.u64(predict_start_time), txb.pure.u64(predict_end_time) ],
+        });
+
+
+        // make a report epoch
+        const report_epoch = txb.moveCall({
+            target: '0xa5e20fbc457babd65e5d1927d7d20451a6681e3ae0751703dfea0da129f5e33e::kiosk_practice::set_report_epoch',
+            arguments: [ txb.pure.u64(report_start_time), txb.pure.u64(report_end_time) ],
+        });
+
+
+
+
+
+        const start_game_cap = "0x9f70aebfb15b6c7af38d781b6ae65eb2fc16b9d516399d652c363f109a613d2f";
+        const end_game_cap = "0xcecbdd4cd570dcf56273eba8aaf9bbee35519f4373dfec77730da74cf1fb23cd";
+        const game_price = 1000000;
+        let clock = "0x6"
+
+        // start the game
+        const new_game = txb.moveCall({
+            target: '0xa5e20fbc457babd65e5d1927d7d20451a6681e3ae0751703dfea0da129f5e33e::kiosk_practice::start_game',
+            arguments: [ txb.object(start_game_cap), txb.pure.u64(game_price), txb.object(predict_epoch), txb.object(report_epoch), txb.object(clock)],
+        });
+
+
+
+        
+        // const game_result = 232;
+
+        // end the game
+        // txb.moveCall({
+        //     target: '0xa5e20fbc457babd65e5d1927d7d20451a6681e3ae0751703dfea0da129f5e33e::kiosk_practice::close_game',
+        //     arguments: [ txb.object(end_game_cap), txb.object(new_game), txb.pure.u64(game_result)],
+        // });
 
     
 
-        // create Kiosk TxBlock
-        const kioskTx = new KioskTransaction({ kioskClient, transactionBlock: txb, cap: await getCap() });
+        // // create Kiosk TxBlock for the user who will place a prediction
+        // const kioskTx = new KioskTransaction({ kioskClient, transactionBlock: txb, cap: await getCapWalletOne() });
 
 
 
-        // create a new kiosk
-        kioskTx.create();
+        // // create a new kiosk
+        // kioskTx.create();
 
 
 
@@ -98,24 +152,7 @@ const getCap = async () => {
 
 
 
-        // const predict_start_time = 22;
-        // const predict_end_time = 555;
-
-        
-        // // make a epoch (works)
-        // const predict_epoch = txb.moveCall({
-        //     target: '0xa5e20fbc457babd65e5d1927d7d20451a6681e3ae0751703dfea0da129f5e33e::kiosk_practice::set_predict_epoch',
-        //     arguments: [ txb.pure.u64(predict_start_time), txb.pure.u64(predict_end_time) ],
-        // });
-
-
-        
-
-        // // delete the epoch (works)
-        // txb.moveCall({
-        //     target: '0xa5e20fbc457babd65e5d1927d7d20451a6681e3ae0751703dfea0da129f5e33e::kiosk_practice::delete_epoch',
-        //     arguments: [ txb.object(predict_epoch)],
-        // });
+       
 
 
 
@@ -179,10 +216,10 @@ const getCap = async () => {
 
 
 
-        kioskTx.shareAndTransferCap(keypairdev.getPublicKey().toRawBytes());
+        // kioskTx.shareAndTransferCap(keypairWalletOne.getPublicKey().toRawBytes());
 
-        // finalize the kiosk transaction
-        kioskTx.finalize();
+        // // finalize the kiosk transaction
+        // kioskTx.finalize();
         
         
 
