@@ -1,6 +1,6 @@
 import { SuiClient, getFullnodeUrl } from '@mysten/sui.js/client';
 import { TransactionBlock } from '@mysten/sui.js/transactions';
-import { MIST_PER_SUI } from '@mysten/sui.js/utils';
+import { MIST_PER_SUI, fromB64, fromHEX } from '@mysten/sui.js/utils';
 // import { JsonRpcProvider, testnetConnection } from '@mysten/sui.js';
 
 import { Ed25519Keypair } from '@mysten/sui.js/keypairs/ed25519';
@@ -97,24 +97,41 @@ const [coin] = txb.splitCoins(txb.gas, [10000000]);
 // });
 
 
-const keypair = new Ed25519Keypair();
-const pubKey = keypair.getPublicKey().toSuiAddress();
-const pubKeyBytes = keypair.getPublicKey().toRawBytes();
-
-const privkey = keypair.getSecretKey().toString();
+// const keypair = new Ed25519Keypair();
+// const pubKey = keypair.getPublicKey().toSuiAddress();
+// const pubKeyBytes = keypair.getPublicKey().toRawBytes();
 
 
-console.log(
-	`public key: ${ pubKey }`
-);
+// const  privKeypairDecoded = keypair.decodeSuiPrivateKey(privkey);
+
+// console.log(
+// 	`public key: ${ pubKey }`
+// );
 
 
 
-console.log(
-	`public key: ${ privkey }`
-);
+// console.log(
+// 	`private key as bech32: ${ privkey }`
+// );
 
 
+
+
+// console.log(
+// 	`private key as keypair: ${ privKeypairDecoded }`
+// );
+
+const pk = "suiprivkey1qp8sxjyrhju8q86t53hthmunx6vz4el77l8044r2j9vehak6qdarq4yud7x"
+// const kp_import = Ed25519Keypair.fromSecretKey(fromHex("0xd463e11c7915945e86ac2b72d88b8190cfad8ff7b48e7eb892c275a5cf0a3e82"));
+
+// const MNEMONICS = "treat rain attract net shiver try disagree veteran minimum unfold borrow ice"
+
+// const kp_derive_0 = Ed25519Keypair.deriveKeypair({MNEMONICS});
+
+
+// console.log(
+//     `path: ${ balance(kp_derive_0) }`
+// )
 
 console.log(
     `acct balance: ${ balance(acctBalance) }`
