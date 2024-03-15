@@ -10,6 +10,12 @@ const privateKeyArray = wallet.privateKey.split(',').map(num => parseInt(num, 10
 const privateKeyBytes = new Uint8Array(privateKeyArray);
 const keypair = Ed25519Keypair.fromSecretKey(privateKeyBytes);
 
+
+console.log(`Public Key raw bytes: ${keypair.getPublicKey().toRawBytes()}`);
+
+console.log(`Public Key: ${keypair.getPublicKey().toSuiAddress()}`);
+
+
 // client
 const client = new SuiClient({
     url: getFullnodeUrl('testnet'),
@@ -24,16 +30,32 @@ const client = new SuiClient({
         const txb = new TransactionBlock();
         
 
-        // const kp1 = keypair.getPublicKey().toSuiAddress();
        
-        console.log(`Public Key: ${keypair.getPublicKey().toRawBytes()}`);
-
+        
        
 
-        // console.log(
-        //     `kp1: ${ keypair(kp1) }`
-        // )
-       
+
+
+
+
+
+
+
+
+
+        
+        // finalize
+        let txid = await client.signAndExecuteTransactionBlock({
+            signer: keypair,
+            transactionBlock: txb,
+        });
+        
+
+
+
+        console.log(`Transaction result: ${JSON.stringify(txid, null, 2)}`);
+        console.log(`success: https://suiexplorer.com/txblock/${txid.digest}?network=testnet`);
+
 
 
     } catch (e) {
