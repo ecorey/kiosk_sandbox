@@ -12,17 +12,15 @@ import { decodeSuiPrivateKey } from '@mysten/sui.js/cryptography';
 // generate keypair_one from a .json file with the raw bytes of the private key
 const privateKeyArray = wallet.privateKey.split(',').map(num => parseInt(num, 10));
 const privateKeyBytes = new Uint8Array(privateKeyArray);
-const keypair_one = Ed25519Keypair.fromSecretKey(privateKeyBytes);
+const keypair_dev = Ed25519Keypair.fromSecretKey(privateKeyBytes);
 
 
 // pb / pk keypair_one
-console.log(`Public Key: ${keypair_one.getPublicKey().toSuiAddress()}`);
+console.log(`Public Key dev: ${keypair_dev.getPublicKey().toSuiAddress()}`);
 
-console.log(`Public Key to raw bytes: ${keypair_one.getPublicKey().toRawBytes()}`);
+console.log(`Public Key dev to raw bytes: ${keypair_dev.getPublicKey().toRawBytes()}`);
 
-console.log(`Secret Key to raw bytes: ${privateKeyBytes}`);
-
-
+console.log(`Secret Key dev to raw bytes: ${privateKeyBytes}`);
 
 
 
@@ -30,31 +28,33 @@ console.log(`Secret Key to raw bytes: ${privateKeyBytes}`);
 
 
 
-// pb / pk keypair_two
+
+
+// pb / pk keyPair_one
 
 // generate a keypair from mnemonic
 const exampleMnemonic = 'treat rain attract net shiver try disagree veteran minimum unfold borrow ice';
  
-const keyPair_two = Ed25519Keypair.deriveKeypair(exampleMnemonic);
+const keyPair_one = Ed25519Keypair.deriveKeypair(exampleMnemonic);
 
 // logs the public key
-console.log(`Public Key 2: ${keyPair_two.getPublicKey().toSuiAddress()}`);
+console.log(`Public Key One: ${keyPair_one.getPublicKey().toSuiAddress()}`);
 
-console.log(`Public Key 2 to raw bytes: ${keyPair_two.getPublicKey().toRawBytes()}`);
+console.log(`Public Key One to raw bytes: ${keyPair_one.getPublicKey().toRawBytes()}`);
 
 
 // logs the private key
-const pk_two = keyPair_two.getSecretKey();
+const pk_one = keyPair_one.getSecretKey();
 
-console.log(`Private Key 2: ${pk_two}`);
+console.log(`Private Key One: ${pk_one}`);
 
 // get pkey encoded from the secretKey function then decode it
-const secKey_two = 'suiprivkey1qzj5dtex3nv4qz7mjerzrkv4yyhrm6uxmpt5hyfk9jft5qyqjcat2rfst8m';
+const secKey_one = 'suiprivkey1qzj5dtex3nv4qz7mjerzrkv4yyhrm6uxmpt5hyfk9jft5qyqjcat2rfst8m';
 
 
-const secKey  = decodeSuiPrivateKey(secKey_two);
+const secKey  = decodeSuiPrivateKey(secKey_one);
 
-console.log(`Private Key 2 to raw bytes: ${secKey.secretKey}`);
+console.log(`Private Key One to raw bytes: ${secKey.secretKey}`);
 
 
 
@@ -103,7 +103,7 @@ const client = new SuiClient({
         
         // finalize the transaction block
         let txid = await client.signAndExecuteTransactionBlock({
-            signer: keypair_one,
+            signer: keypair_dev,
             transactionBlock: txb,
         });
         

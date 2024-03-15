@@ -2,25 +2,44 @@
 import { getFullnodeUrl, SuiClient, SuiHTTPTransport  } from "@mysten/sui.js/client";
 import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
 import { TransactionBlock } from "@mysten/sui.js/transactions";
-import wallet from './dev-wallet.json' assert { type: 'json' };
+import walletDev from './dev-wallet.json' assert { type: 'json' };
+import walletOne from './wallet-one.json' assert { type: 'json' };
+
 import { KioskClient, Network, KioskTransaction } from '@mysten/kiosk';
 import { WebSocket } from 'ws';
 
 
 
 // generate a keypair
-const privateKeyArray = wallet.privateKey.split(',').map(num => parseInt(num, 10));
+const privateKeyArray = walletDev.privateKey.split(',').map(num => parseInt(num, 10));
 const privateKeyBytes = new Uint8Array(privateKeyArray);
-const keypair = Ed25519Keypair.fromSecretKey(privateKeyBytes);
+const keypairdev = Ed25519Keypair.fromSecretKey(privateKeyBytes);
 
 
-console.log(`Public Key raw bytes: ${keypair.getPublicKey().toRawBytes()}`);
+console.log(`Public Key dev to raw bytes: ${keypairdev.getPublicKey().toRawBytes()}`);
 
-console.log(`Public Key: ${keypair.getPublicKey().toSuiAddress()}`);
+console.log(`Public Key dev: ${keypairdev.getPublicKey().toSuiAddress()}`);
 
 
+
+// generate a keypair for another user that publishes the contract 
+const privateKeyArrayWalletOne = walletOne.privateKey.split(',').map(num => parseInt(num, 10));
+const privateKeyBytesWalletOne = new Uint8Array(privateKeyArrayWalletOne);
+const keypairWalletOne = Ed25519Keypair.fromSecretKey(privateKeyBytesWalletOne);
+
+
+console.log(`Public Key wallet one to raw bytes: ${keypairWalletOne.getPublicKey().toRawBytes()}`);
+
+console.log(`Public Key wallet one: ${keypairWalletOne.getPublicKey().toSuiAddress()}`);
+
+
+
+
+// consts
 const PACKAGE_ID = "0xd32b20876598c0d1c903a2834c857278435c8da704a6e2183c6e1c704eb72efe";
 const itemType = '0xd32b20876598c0d1c903a2834c857278435c8da704a6e2183c6e1c704eb72efe::kiosk_practice::Prediction';
+
+
 
 
 // client
@@ -39,9 +58,9 @@ const kioskClient = new KioskClient({
 });
 
 
-
+// function to get the kiosk owner cap
 const getCap = async () => {
-    let { kioskOwnerCaps } = await kioskClient.getOwnedKiosks(keypair.getPublicKey().toRawBytes());
+    let { kioskOwnerCaps } = await kioskClient.getOwnedKiosks(keypairdev.getPublicKey().toRawBytes());
     // Assume that the user has only 1 kiosk.
     // Here, you need to do some more checks in a realistic scenario.
     // And possibly give the user in our dApp a kiosk selector to choose which one they want to interact with (if they own more than one).
@@ -73,46 +92,52 @@ const getCap = async () => {
         // create a new kiosk
         kioskTx.create();
 
-        const predict_start_time = 22;
-        const predict_end_time = 555;
+
+
+
+
+
+
+        // const predict_start_time = 22;
+        // const predict_end_time = 555;
 
         
-        // make a epoch (works)
-        const predict_epoch = txb.moveCall({
-            target: '0xd32b20876598c0d1c903a2834c857278435c8da704a6e2183c6e1c704eb72efe::kiosk_practice::set_predict_epoch',
-            arguments: [ txb.pure.u64(predict_start_time), txb.pure.u64(predict_end_time) ],
-        });
+        // // make a epoch (works)
+        // const predict_epoch = txb.moveCall({
+        //     target: '0xd32b20876598c0d1c903a2834c857278435c8da704a6e2183c6e1c704eb72efe::kiosk_practice::set_predict_epoch',
+        //     arguments: [ txb.pure.u64(predict_start_time), txb.pure.u64(predict_end_time) ],
+        // });
 
 
         
 
-        // delete the epoch (works)
-        txb.moveCall({
-            target: '0xd32b20876598c0d1c903a2834c857278435c8da704a6e2183c6e1c704eb72efe::kiosk_practice::delete_epoch',
-            arguments: [ txb.object(predict_epoch)],
-        });
+        // // delete the epoch (works)
+        // txb.moveCall({
+        //     target: '0xd32b20876598c0d1c903a2834c857278435c8da704a6e2183c6e1c704eb72efe::kiosk_practice::delete_epoch',
+        //     arguments: [ txb.object(predict_epoch)],
+        // });
 
 
 
 
 
-        const guess = 232;
-        let clock = "0x6"
+        // const guess = 232;
+        // let clock = "0x6"
 
-        // make a prediction (works)
-        const prediction = txb.moveCall({
-            target: '0xd32b20876598c0d1c903a2834c857278435c8da704a6e2183c6e1c704eb72efe::kiosk_practice::make_prediction',
-            arguments: [ txb.pure.u64(guess), txb.object(clock)],
-        });
+        // // make a prediction (works)
+        // const prediction = txb.moveCall({
+        //     target: '0xd32b20876598c0d1c903a2834c857278435c8da704a6e2183c6e1c704eb72efe::kiosk_practice::make_prediction',
+        //     arguments: [ txb.pure.u64(guess), txb.object(clock)],
+        // });
 
 
         
     
-        // place a prediction in the kiosk (works)
-        const prediction_id = kioskTx.place({
-            item: txb.object(prediction),
-            itemType: itemType,
-        });
+        // // place a prediction in the kiosk (works)
+        // const prediction_id = kioskTx.place({
+        //     item: txb.object(prediction),
+        //     itemType: itemType,
+        // });
 
 
 
@@ -136,11 +161,11 @@ const getCap = async () => {
 
 
 
-        // take the prediction from the kiosk
-        kioskTx.take({
-            itemType: prediction,
-            itemId: prediction_id,
-        });
+        // // take the prediction from the kiosk
+        // kioskTx.take({
+        //     itemType: prediction,
+        //     itemId: prediction_id,
+        // });
 
 
 
@@ -154,7 +179,7 @@ const getCap = async () => {
 
 
 
-        kioskTx.shareAndTransferCap(keypair.getPublicKey().toRawBytes());
+        kioskTx.shareAndTransferCap(keypairdev.getPublicKey().toRawBytes());
 
         // finalize the kiosk transaction
         kioskTx.finalize();
@@ -188,7 +213,7 @@ const getCap = async () => {
         
         // finalize the transaction block
         let txid = await client.signAndExecuteTransactionBlock({
-            signer: keypair,
+            signer: keypairdev,
             transactionBlock: txb,
         });
         
