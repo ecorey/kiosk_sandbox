@@ -19,7 +19,7 @@ console.log(`Public Key raw bytes: ${keypair.getPublicKey().toRawBytes()}`);
 console.log(`Public Key: ${keypair.getPublicKey().toSuiAddress()}`);
 
 
-const PACKAGE_ID = "0xaafa4058de49a7fb79d450c61e33ee03033c7c21634b24b73e0bf2a021798725";
+const PACKAGE_ID = "0x895f2a2f0fd15f302cab1d90790cad680d19ef4d4f20679264a263fc4ecc2d9e";
 
 
 // client
@@ -72,30 +72,48 @@ const getCap = async () => {
         // create a new kiosk
         kioskTx.create();
 
-        const clock = "0x6";
-        const guess = 222;
+        const predict_start_time = 22;
+        const predict_end_time = 555;
 
-        // make a prediction 
-        const prediction = txb.moveCall({
-            target: '0xaafa4058de49a7fb79d450c61e33ee03033c7c21634b24b73e0bf2a021798725::kiosk_practice::make_prediction',
-            arguments: [ txb.pure(guess), txb.object(clock) ],
+        
+        // make a prediction
+        const predict_epoch = txb.moveCall({
+            target: '0x895f2a2f0fd15f302cab1d90790cad680d19ef4d4f20679264a263fc4ecc2d9e::kiosk_practice::set_predict_epoch',
+            arguments: [ txb.pure.u64(predict_start_time), txb.pure.u64(predict_end_time) ],
         });
+
+
+        console.log(predict_epoch);
+
+
+
+        // delete the prediction
+        txb.moveCall({
+            target: '0x895f2a2f0fd15f302cab1d90790cad680d19ef4d4f20679264a263fc4ecc2d9e::kiosk_practice::delete_epoch',
+            arguments: [ txb.object(predict_epoch)],
+        });
+
+
 
 
 
         // place a prediction in the kiosk
-        kioskTx.place({
-            itemType: prediction,
-            item: 'Prediction',
-        });
+        // kioskTx.place({
+        //     itemType: prediction,
+        //     item: 'Prediction',
+        // });
 
 
 
-        kioskTx.list({
-            itemType: prediction,
-            item: 'Prediction',
-            price: 1000000,
-        });
+        // kioskTx.list({
+        //     itemType: prediction,
+        //     item: 'Prediction',
+        //     price: 1000000,
+        // });
+
+
+
+
 
 
 
