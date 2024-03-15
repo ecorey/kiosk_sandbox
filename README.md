@@ -1,18 +1,11 @@
 # Latest Testnet
 
-┌──                                                                                                                                                                                                                                                           │
-│  │ PackageID: 0xa5e20fbc457babd65e5d1927d7d20451a6681e3ae0751703dfea0da129f5e33e                                                                                                                                                                               │
-│  │ Version: 1                                                                                                                                                                                                                                                  │
-│  │ Digest: 3B8hzNMRTTrQi39Jfe61Wu7Pr1Pz2bGmHVEDzTRFSL51                                                                                                                                                                                                        │
-│  │ Modules: kiosk_practice, royalty_policy, switchboard_oracle                                                                                                                                                                                                 │
-│  └──                                                                                                                                                                                                                                                           │
-╰────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
-╭───────────────────────────────────────────────────────────────────────────────────────────────────╮
-│ Balance Changes                                                                                   │
-├───────────────────────────────────────────────────────────────────────────────────────────────────┤
-│  ┌──                                                                                              │
-│  │ Owner: Account Address ( 0xe5f5e09892328ff278b473f485cbf85cef8a9958112023c84126aec3d32b8114 )  │                                                                         │
-│  └──                                                                  
+PackageID: 0xa5e20fbc457babd65e5d1927d7d20451a6681e3ae0751703dfea0da129f5e33e                                                                                                                                                                           
+Version: 1                                                                                                                                                                                                                                                  
+Digest: 3B8hzNMRTTrQi39Jfe61Wu7Pr1Pz2bGmHVEDzTRFSL51                                                                                                                                                                                                        
+Modules: kiosk_practice, royalty_policy, switchboard_oracle                                                                                                                                                                                         
+Owner: Account Address ( 0xe5f5e09892328ff278b473f485cbf85cef8a9958112023c84126aec3d32b8114 )  
+
 
 
 # CLI Example
