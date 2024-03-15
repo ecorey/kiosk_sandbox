@@ -5,20 +5,57 @@ import { TransactionBlock } from "@mysten/sui.js/transactions";
 import wallet from './dev-wallet.json' assert { type: 'json' };
 import { WebSocket } from 'ws';
 
+import { decodeSuiPrivateKey } from '@mysten/sui.js/cryptography';
 
 
-// generate a keypair
+
+// generate keypair_one from a .json file with the raw bytes of the private key
 const privateKeyArray = wallet.privateKey.split(',').map(num => parseInt(num, 10));
 const privateKeyBytes = new Uint8Array(privateKeyArray);
-const keypair = Ed25519Keypair.fromSecretKey(privateKeyBytes);
+const keypair_one = Ed25519Keypair.fromSecretKey(privateKeyBytes);
 
 
-console.log(`Public Key raw bytes: ${keypair.getPublicKey().toRawBytes()}`);
+// pb / pk keypair_one
+console.log(`Public Key: ${keypair_one.getPublicKey().toSuiAddress()}`);
+
+console.log(`Public Key to raw bytes: ${keypair_one.getPublicKey().toRawBytes()}`);
 
 console.log(`Secret Key to raw bytes: ${privateKeyBytes}`);
 
 
-console.log(`Public Key: ${keypair.getPublicKey().toSuiAddress()}`);
+
+
+
+
+
+
+
+// pb / pk keypair_two
+
+// generate a keypair from mnemonic
+const exampleMnemonic = 'treat rain attract net shiver try disagree veteran minimum unfold borrow ice';
+ 
+const keyPair_two = Ed25519Keypair.deriveKeypair(exampleMnemonic);
+
+// logs the public key
+console.log(`Public Key 2: ${keyPair_two.getPublicKey().toSuiAddress()}`);
+
+console.log(`Public Key 2 to raw bytes: ${keyPair_two.getPublicKey().toRawBytes()}`);
+
+
+// logs the private key
+const pk_two = keyPair_two.getSecretKey();
+
+console.log(`Private Key 2: ${pk_two}`);
+
+const secKey_two = 'suiprivkey1qzj5dtex3nv4qz7mjerzrkv4yyhrm6uxmpt5hyfk9jft5qyqjcat2rfst8m';
+
+
+const secKey  = decodeSuiPrivateKey(secKey_two);
+
+console.log(`Private Key 2 to raw bytes: ${secKey.secretKey}`);
+
+
 
 
 
@@ -65,7 +102,7 @@ const client = new SuiClient({
         
         // finalize the transaction block
         let txid = await client.signAndExecuteTransactionBlock({
-            signer: keypair,
+            signer: keypair_one,
             transactionBlock: txb,
         });
         
