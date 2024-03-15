@@ -1,9 +1,10 @@
 // imports
-import { getFullnodeUrl, SuiClient } from "@mysten/sui.js/client";
+import { getFullnodeUrl, SuiClient, SuiHTTPTransport  } from "@mysten/sui.js/client";
 import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
 import { TransactionBlock } from "@mysten/sui.js/transactions";
 import wallet from './dev-wallet.json' assert { type: 'json' };
 import { KioskClient, Network, KioskTransaction } from '@mysten/kiosk';
+import { WebSocket } from 'ws';
 
 
 
@@ -23,7 +24,10 @@ const PACKAGE_ID = "0xaafa4058de49a7fb79d450c61e33ee03033c7c21634b24b73e0bf2a021
 
 // client
 const client = new SuiClient({
-    url: getFullnodeUrl('testnet'),
+    transport: new SuiHTTPTransport({
+        url: getFullnodeUrl('testnet'),
+        WebSocketConstructor: WebSocket
+    }),
 });
 
 
@@ -58,8 +62,7 @@ const getCap = async () => {
 
        
 
-        
-
+    
 
         // create Kiosk TxBlock
         const kioskTx = new KioskTransaction({ kioskClient, transactionBlock: txb, cap: await getCap() });
@@ -68,6 +71,31 @@ const getCap = async () => {
 
         // create a new kiosk
         kioskTx.create();
+
+        const clock = "0x6";
+        const guess = 222;
+
+        // make a prediction 
+        const prediction = txb.moveCall({
+            target: '0xaafa4058de49a7fb79d450c61e33ee03033c7c21634b24b73e0bf2a021798725::kiosk_practice::make_prediction',
+            arguments: [ txb.pure(guess), txb.object(clock) ],
+        });
+
+
+
+        // place a prediction in the kiosk
+        kioskTx.place({
+            itemType: prediction,
+            item: 'Prediction',
+        });
+
+
+
+        kioskTx.list({
+            itemType: prediction,
+            item: 'Prediction',
+            price: 1000000,
+        });
 
 
 
@@ -79,9 +107,12 @@ const getCap = async () => {
         
 
 
+
+
+
         // subscribe to events for the package
-        // let unsubscribe = await provider.subscribeEvent({
-        //     filter: { PACKAGE_ID },
+        // let unsubscribe = await client.subscribeEvent({
+        //     filter: { All },
         //     onMessage: (event) => {
         //         console.log("subscribeEvent", JSON.stringify(event, null, 2))
         //     }
