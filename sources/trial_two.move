@@ -158,12 +158,12 @@ module kiosk_practice::kiosk_practice {
     struct Game has key, store {
         id: UID,
         price: u64,
-        pot: Balance<SUI>, // holds the balance of the game instance, init to zero
-        result: Option<u64>,  // will hold the result from the switchboard oracle, initialize to zero / add update function
-        predict_epoch: Epoch, // start and end time for predictions
-        report_epoch: Epoch, // start and end time for reporting the winner
-        game_closed: bool, // bool to check if the game is closed
-        winner_claimed: bool, // bool to check if the winner has claimed the pot
+        pot: Balance<SUI>, 
+        result: Option<u64>,  
+        predict_epoch: Epoch, 
+        report_epoch: Epoch, 
+        game_closed: bool, 
+        winner_claimed: bool, 
         
     }
 
@@ -181,11 +181,11 @@ module kiosk_practice::kiosk_practice {
 
 
     // event emitted when a winner is reported  
-    struct Winner has copy, drop {
-        prediction: Option<u64>,
-        made_by: address,
-        time: u64,
-    }
+    // struct Winner has copy, drop {
+    //     prediction: Option<u64>,
+    //     made_by: address,
+    //     time: u64,
+    // }
 
 
 
@@ -232,18 +232,18 @@ module kiosk_practice::kiosk_practice {
 
     // REDO
     // close the game/ sets the result and allows the report winner function to be called
-    public fun close_game(end_game_cap: EndGameCap, game_instance: &mut Game, aggregator: &Aggregator, ctx: &mut TxContext) : bool {
+    public fun close_game(end_game_cap: EndGameCap, game_instance: &mut Game, result: u64, ctx: &mut TxContext) : bool {
         
-        assert!(game_instance.predict_epoch.end_time < tx_context::epoch(ctx), EOutsideWindow);
+        // assert!(game_instance.predict_epoch.end_time < tx_context::epoch(ctx), EOutsideWindow);
         game_instance.game_closed = true;
         
-        switchboard_oracle::save_aggregator_info(aggregator, ctx);
+        // switchboard_oracle::save_aggregator_info(aggregator, ctx);
 
         let EndGameCap { id } = end_game_cap;
         object::delete(id);
 
         // ORACLE logic to save the data to the game instance' result field
-        // game_instance.result = option::some(result.latest_result);
+        game_instance.result = option::some(result);
 
         game_instance.game_closed
         
@@ -253,85 +253,73 @@ module kiosk_practice::kiosk_practice {
 
 
     // claim the winner within timeframe by ref, add event to mark the winner
-    public fun claim_winner(prediction: Prediction, game_instance: Game, clock: &Clock, ctx: &mut TxContext ) : (bool, address, Balance<SUI>, bool) {
+    // public fun claim_winner(prediction: Prediction, game_instance: Game, clock: &Clock, ctx: &mut TxContext ) : (bool, address, Balance<SUI>, bool) {
         
-        assert!(game_instance.game_closed, EGameNotClosed);
+    //     assert!(game_instance.game_closed, EGameNotClosed);
 
-        //checks the timestamp is within the report epoch timeframe
-        assert!(clock::timestamp_ms(clock) > game_instance.report_epoch.start_time, EOutsideWindow);
-        assert!(clock::timestamp_ms(clock) < game_instance.report_epoch.end_time, EOutsideWindow);
+    //     //checks the timestamp is within the report epoch timeframe
+    //     assert!(clock::timestamp_ms(clock) > game_instance.report_epoch.start_time, EOutsideWindow);
+    //     assert!(clock::timestamp_ms(clock) < game_instance.report_epoch.end_time, EOutsideWindow);
 
-        // checks the prediction is within the predict epoch timeframe
-        assert!(prediction.timestamp > game_instance.predict_epoch.start_time, EOutsideWindow);
-        assert!(prediction.timestamp < game_instance.predict_epoch.end_time, EOutsideWindow);
+    //     // checks the prediction is within the predict epoch timeframe
+    //     assert!(prediction.timestamp > game_instance.predict_epoch.start_time, EOutsideWindow);
+    //     assert!(prediction.timestamp < game_instance.predict_epoch.end_time, EOutsideWindow);
 
-        assert!(prediction.prediction == game_instance.result, EIncorrectPrediction);
+    //     assert!(prediction.prediction == game_instance.result, EIncorrectPrediction);
 
-        let bool_val = true;
+    //     let bool_val = true;
 
-        if(prediction.prediction == game_instance.result) {
-            event::emit(Winner {
-                prediction: prediction.prediction,
-                made_by: tx_context::sender(ctx),
-                time: clock::timestamp_ms(clock),
-            });
-        };
-
-
-        if(prediction.prediction == game_instance.result) {
-            let bool_val = true;
-        } else {
-            let bool_val = false;
-        };
-
-        
-        if(prediction.prediction == game_instance.result) {
-
-            game_instance.winner_claimed = true;
-           
-            let bal_all = balance::withdraw_all(&mut game_instance.pot);
-
-            let winning_pot = coin::from_balance(bal_all, ctx);
-
-            transfer::public_transfer(winning_pot, tx_context::sender(ctx));
-        };
-        
-        let Game { id, price: _, pot, result: _, predict_epoch, report_epoch, game_closed: _, winner_claimed} = game_instance;
-        object::delete(id);
-
-
-        let Epoch { id, start_time: _, end_time: _} = predict_epoch;
-        object::delete(id);
-
-
-        let Epoch { id, start_time: _, end_time: _} = report_epoch;
-        object::delete(id);
-
-        let Prediction {id, prediction_id: _, prediction: _, timestamp: _} = prediction;
-        object::delete(id);
-
-
-
-        (bool_val, tx_context::sender(ctx), pot, winner_claimed)
-
-
-    } 
-    
-
-    // CHANGE TO TIMESTAMPS
-    // public fun set_predict_epoch(start_time: u64, end_time: u64, ctx: &mut TxContext)  {
-        
-    //     let predict_epoch  = Epoch {
-    //         id: object::new(ctx),
-    //         start_time,
-    //         end_time,
+    //     if(prediction.prediction == game_instance.result) {
+    //         event::emit(Winner {
+    //             prediction: prediction.prediction,
+    //             made_by: tx_context::sender(ctx),
+    //             time: clock::timestamp_ms(clock),
+    //         });
     //     };
 
-    //     transfer::public_transfer(predict_epoch, tx_context::sender(ctx));
 
-    // }
+    //     if(prediction.prediction == game_instance.result) {
+    //         let bool_val = true;
+    //     } else {
+    //         let bool_val = false;
+    //     };
 
-     public fun set_predict_epoch(start_time: u64, end_time: u64, ctx: &mut TxContext) : Epoch  {
+        
+    //     if(prediction.prediction == game_instance.result) {
+
+    //         game_instance.winner_claimed = true;
+           
+    //         let bal_all = balance::withdraw_all(&mut game_instance.pot);
+
+    //         let winning_pot = coin::from_balance(bal_all, ctx);
+
+    //         transfer::public_transfer(winning_pot, tx_context::sender(ctx));
+    //     };
+        
+    //     let Game { id, price: _, pot, result: _, predict_epoch, report_epoch, game_closed: _, winner_claimed} = game_instance;
+    //     object::delete(id);
+
+
+    //     let Epoch { id, start_time: _, end_time: _} = predict_epoch;
+    //     object::delete(id);
+
+
+    //     let Epoch { id, start_time: _, end_time: _} = report_epoch;
+    //     object::delete(id);
+
+    //     let Prediction {id, prediction_id: _, prediction: _, } = prediction;
+    //     object::delete(id);
+
+
+
+    //     (bool_val, tx_context::sender(ctx), pot, winner_claimed)
+
+
+    // } 
+    
+
+
+    public fun set_predict_epoch(start_time: u64, end_time: u64, ctx: &mut TxContext) : Epoch  {
         
         let predict_epoch  = Epoch {
             id: object::new(ctx),
@@ -344,21 +332,9 @@ module kiosk_practice::kiosk_practice {
     }
 
 
-    // CHANGE TO TIMESTAMPS
-    // public fun set_report_epoch(start_time: u64, end_time: u64, ctx: &mut TxContext) {
-        
-    //     let report_epoch  = Epoch {
-    //         id: object::new(ctx),
-    //         start_time,
-    //         end_time,
-    //     };
-
-    //     transfer::public_transfer(report_epoch, tx_context::sender(ctx));
-
-    // }
 
 
-     public fun set_report_epoch(start_time: u64, end_time: u64, ctx: &mut TxContext) : Epoch {
+    public fun set_report_epoch(start_time: u64, end_time: u64, ctx: &mut TxContext) : Epoch {
         
         let report_epoch  = Epoch {
             id: object::new(ctx),
@@ -370,6 +346,18 @@ module kiosk_practice::kiosk_practice {
 
     }
     
+
+
+
+    // deletes the epoch
+    public fun delete_epoch(epoch: Epoch, ctx: &mut TxContext) {
+        let Epoch { id, start_time: _, end_time: _ } = epoch;
+        object::delete(id);
+    }
+
+
+
+
 
 
 
@@ -402,9 +390,6 @@ module kiosk_practice::kiosk_practice {
 
         // add royality rule to the transfer policy with a 5% royality fee
         add_royalty_to_policy(&mut transfer_policy, &tp_cap, 005_00);
-
-
-        
 
 
         // transfer the publisher, transfer policy cap and game owner cap to the sender and share the registry
@@ -478,22 +463,14 @@ module kiosk_practice::kiosk_practice {
    
 
 
-    // makes a prediction and locks it in the users kiosk and emits an event for the prediction
-    // ADD COST THAT GOES TO BALANCE
-    public fun make_prediction(game: &mut Game, _tp: &TransferPolicy<Prediction>, cost: Coin<SUI>, kiosk: &mut Kiosk, kiosk_owner_cap: &KioskOwnerCap,  predict: u64, clock: &Clock, ctx: &mut TxContext)  {
+   public fun make_prediction( predict: u64, clock: &Clock, ctx: &mut TxContext) : Prediction {
         
-        
-
-
-
-        assert!(coin::value(&cost) < game.price, EWrongPrice);
-
-        balance::join(&mut game.pot, coin::into_balance(cost));
-        
+      
         event::emit(PredictionMade {
             prediction: option::some(predict),
             made_by: tx_context::sender(ctx),
         });
+
 
         let id = object::new(ctx);
         let prediction_id = object::uid_to_inner(&id);
@@ -506,13 +483,25 @@ module kiosk_practice::kiosk_practice {
         };
 
 
-        // place and lock item into the kiosk
-        kiosk::lock(kiosk, kiosk_owner_cap, _tp, prediction);
+        prediction
        
+    }
 
-        
+
+
+
+    // deletes the prediction
+    public fun delete_prediction(prediction: Prediction, ctx: &mut TxContext) {
+
+        let Prediction { id, prediction_id: _, prediction: _, timestamp: _ } = prediction;
+        object::delete(id);
 
     }
+
+
+
+
+    
 
 
 
@@ -521,21 +510,7 @@ module kiosk_practice::kiosk_practice {
     // ############KIOSK LOGIC############
     // ###################################
 
-    // creates a new kiosk for a user that can hold the predictions 
-    // and returns the kiosk and the kiosk owner cap
-
-    // public fun create_kiosk(ctx: &mut TxContext)  {
-    //     let (kiosk, kiosk_owner_cap) = kiosk::new(ctx);
-    //     transfer::public_transfer(kiosk, tx_context::sender(ctx));
-    //     transfer::public_transfer(kiosk_owner_cap, tx_context::sender(ctx));
-        
-    // }
-
-      public fun create_kiosk(ctx: &mut TxContext)  : (Kiosk, KioskOwnerCap) {
-        let (kiosk, kiosk_owner_cap) = kiosk::new(ctx);
-        (kiosk, kiosk_owner_cap)
-        
-    }
+    
 
 
     // burns the prediction from the kiosk and deletes the prediction
@@ -552,39 +527,10 @@ module kiosk_practice::kiosk_practice {
 
 
 
-    // lists the prediction in the kiosk for sale
-    public fun list_prediction<T: key + store>(
-        kiosk: &mut Kiosk, 
-        kiosk_cap: &KioskOwnerCap, 
-        prediction_id: ID, 
-        price: u64
-    ) {
-        kiosk::list<Prediction>(kiosk, kiosk_cap, prediction_id, price);
-    }
+  
 
 
 
-    // delists the prediction from the kiosk
-    public fun delist_prediction<T: key + store>(
-        kiosk: &mut Kiosk,
-        kiosk_cap: &KioskOwnerCap,
-        prediction_id: ID,
-    ) {
-        kiosk::delist<Prediction>(kiosk, kiosk_cap, prediction_id);
-    }
-
-
-
-    // purchase a prediction from another user
-    public fun purchase_prediction<T: key + store>(
-        kiosk: &mut Kiosk,
-        prediction_id: ID,
-        payment: Coin<SUI>
-        
-    ) : (Prediction, TransferRequest<Prediction>) {
-
-        kiosk::purchase<Prediction>(kiosk, prediction_id, payment)
-    }
 
 
 
@@ -682,10 +628,7 @@ module kiosk_practice::kiosk_practice {
             
 
             // MAKE PREDICTION AND BURN PREDICTION
-            // make_prediction(&mut kiosk, &kiosk_owner_cap, guess, &clock, &transfer_policy, test_scenario::ctx(scenario_val));
-            // burn_from_kiosk( kiosk, kiosk_owner_cap, prediction_id, registry, test_scenario::ctx(scenario_val));
-
-
+            
 
 
 

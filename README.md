@@ -1,31 +1,21 @@
-ORDER TO TEST VIA CLI:
+# Latest Testnet
 
-publish
-create_kiosk
-set_predict_epoch
-set_report_epoch
-start_game
-make_prediction
-list_prediction
-delist_prediction
-burn_from_kiosk
-
-
-// create another account and switch to it 
-purchase_prediction
-
-
-withdraw_balance_from_kiosk
-withdraw_balance_from_tranfer_policy
-withdraw_balance_from_game
+┌──                                                                                                                                                                                                                                                           │
+│  │ PackageID: 0xa5e20fbc457babd65e5d1927d7d20451a6681e3ae0751703dfea0da129f5e33e                                                                                                                                                                               │
+│  │ Version: 1                                                                                                                                                                                                                                                  │
+│  │ Digest: 3B8hzNMRTTrQi39Jfe61Wu7Pr1Pz2bGmHVEDzTRFSL51                                                                                                                                                                                                        │
+│  │ Modules: kiosk_practice, royalty_policy, switchboard_oracle                                                                                                                                                                                                 │
+│  └──                                                                                                                                                                                                                                                           │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+╭───────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ Balance Changes                                                                                   │
+├───────────────────────────────────────────────────────────────────────────────────────────────────┤
+│  ┌──                                                                                              │
+│  │ Owner: Account Address ( 0xe5f5e09892328ff278b473f485cbf85cef8a9958112023c84126aec3d32b8114 )  │                                                                         │
+│  └──                                                                  
 
 
-// cant test keep as prototype
-close_game
-claim_winner
-
-
-
+# CLI Example
 ---
 
 
@@ -94,55 +84,3 @@ start_game:
 
 
 
-
-
-make_prediction:
-
-
-
-list_prediction:
-
-
-
-delist_prediction: 
-
-
-
-burn_from_kiosk:
-
-
-// create another account and switch to it 
-purchase_prediction:
-
-
-
-
-
-
-withdraw_balance_from_kiosk
-withdraw_balance_from_tranfer_policy
-withdraw_balance_from_game
-
-
-
-
-
-
-
-// cant test keep as prototype
-close_game
-claim_winner
-
-
-
-
-
-
-
-
-
-
---- 
-
-
-TEST VIA CLI PTB

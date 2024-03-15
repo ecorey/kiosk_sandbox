@@ -2,7 +2,7 @@
 import { getFullnodeUrl, SuiClient, SuiHTTPTransport  } from "@mysten/sui.js/client";
 import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
 import { TransactionBlock } from "@mysten/sui.js/transactions";
-import walletDev from './dev-wallet.json' assert { type: 'json' };
+import walletDev from './wallet-two.json' assert { type: 'json' };
 import walletOne from './wallet-one.json' assert { type: 'json' };
 
 import { KioskClient, Network, KioskTransaction } from '@mysten/kiosk';
@@ -22,7 +22,7 @@ console.log(`Public Key dev: ${keypairdev.getPublicKey().toSuiAddress()}`);
 
 
 
-// generate a keypair for another user that publishes the contract 
+// generate a keypair for another user 
 const privateKeyArrayWalletOne = walletOne.privateKey.split(',').map(num => parseInt(num, 10));
 const privateKeyBytesWalletOne = new Uint8Array(privateKeyArrayWalletOne);
 const keypairWalletOne = Ed25519Keypair.fromSecretKey(privateKeyBytesWalletOne);
@@ -36,8 +36,8 @@ console.log(`Public Key wallet one: ${keypairWalletOne.getPublicKey().toSuiAddre
 
 
 // consts
-const PACKAGE_ID = "0xd32b20876598c0d1c903a2834c857278435c8da704a6e2183c6e1c704eb72efe";
-const itemType = '0xd32b20876598c0d1c903a2834c857278435c8da704a6e2183c6e1c704eb72efe::kiosk_practice::Prediction';
+const PACKAGE_ID = "0xa5e20fbc457babd65e5d1927d7d20451a6681e3ae0751703dfea0da129f5e33e";
+const itemType = '0xa5e20fbc457babd65e5d1927d7d20451a6681e3ae0751703dfea0da129f5e33e::kiosk_practice::Prediction';
 
 
 
@@ -104,7 +104,7 @@ const getCap = async () => {
         
         // // make a epoch (works)
         // const predict_epoch = txb.moveCall({
-        //     target: '0xd32b20876598c0d1c903a2834c857278435c8da704a6e2183c6e1c704eb72efe::kiosk_practice::set_predict_epoch',
+        //     target: '0xa5e20fbc457babd65e5d1927d7d20451a6681e3ae0751703dfea0da129f5e33e::kiosk_practice::set_predict_epoch',
         //     arguments: [ txb.pure.u64(predict_start_time), txb.pure.u64(predict_end_time) ],
         // });
 
@@ -113,7 +113,7 @@ const getCap = async () => {
 
         // // delete the epoch (works)
         // txb.moveCall({
-        //     target: '0xd32b20876598c0d1c903a2834c857278435c8da704a6e2183c6e1c704eb72efe::kiosk_practice::delete_epoch',
+        //     target: '0xa5e20fbc457babd65e5d1927d7d20451a6681e3ae0751703dfea0da129f5e33e::kiosk_practice::delete_epoch',
         //     arguments: [ txb.object(predict_epoch)],
         // });
 
@@ -126,7 +126,7 @@ const getCap = async () => {
 
         // // make a prediction (works)
         // const prediction = txb.moveCall({
-        //     target: '0xd32b20876598c0d1c903a2834c857278435c8da704a6e2183c6e1c704eb72efe::kiosk_practice::make_prediction',
+        //     target: '0xa5e20fbc457babd65e5d1927d7d20451a6681e3ae0751703dfea0da129f5e33e::kiosk_practice::make_prediction',
         //     arguments: [ txb.pure.u64(guess), txb.object(clock)],
         // });
 
@@ -172,7 +172,7 @@ const getCap = async () => {
 
         // delete the prediction (works)
         // txb.moveCall({
-        //     target: '0xd32b20876598c0d1c903a2834c857278435c8da704a6e2183c6e1c704eb72efe::kiosk_practice::delete_prediction',
+        //     target: '0xa5e20fbc457babd65e5d1927d7d20451a6681e3ae0751703dfea0da129f5e33e::kiosk_practice::delete_prediction',
         //     arguments: [ txb.object(prediction)],
         // });
 
