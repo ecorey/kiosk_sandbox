@@ -19,7 +19,7 @@ console.log(`Public Key raw bytes: ${keypair.getPublicKey().toRawBytes()}`);
 console.log(`Public Key: ${keypair.getPublicKey().toSuiAddress()}`);
 
 
-const PACKAGE_ID = "0x895f2a2f0fd15f302cab1d90790cad680d19ef4d4f20679264a263fc4ecc2d9e";
+const PACKAGE_ID = "0xd32b20876598c0d1c903a2834c857278435c8da704a6e2183c6e1c704eb72efe";
 
 
 // client
@@ -78,21 +78,39 @@ const getCap = async () => {
         
         // make a prediction
         const predict_epoch = txb.moveCall({
-            target: '0x895f2a2f0fd15f302cab1d90790cad680d19ef4d4f20679264a263fc4ecc2d9e::kiosk_practice::set_predict_epoch',
+            target: '0xd32b20876598c0d1c903a2834c857278435c8da704a6e2183c6e1c704eb72efe::kiosk_practice::set_predict_epoch',
             arguments: [ txb.pure.u64(predict_start_time), txb.pure.u64(predict_end_time) ],
         });
 
 
-        console.log(predict_epoch);
-
-
+        
 
         // delete the prediction
         txb.moveCall({
-            target: '0x895f2a2f0fd15f302cab1d90790cad680d19ef4d4f20679264a263fc4ecc2d9e::kiosk_practice::delete_epoch',
+            target: '0xd32b20876598c0d1c903a2834c857278435c8da704a6e2183c6e1c704eb72efe::kiosk_practice::delete_epoch',
             arguments: [ txb.object(predict_epoch)],
         });
 
+
+
+
+
+        const guess = 232;
+        let clock = "0x6"
+
+        // make a prediction
+        const prediction = txb.moveCall({
+            target: '0xd32b20876598c0d1c903a2834c857278435c8da704a6e2183c6e1c704eb72efe::kiosk_practice::make_prediction',
+            arguments: [ txb.pure.u64(guess), txb.object(clock)],
+        });
+
+
+
+        // delete a prediction
+        txb.moveCall({
+            target: '0xd32b20876598c0d1c903a2834c857278435c8da704a6e2183c6e1c704eb72efe::kiosk_practice::delete_prediction',
+            arguments: [ txb.object(prediction)],
+        });
 
 
 
