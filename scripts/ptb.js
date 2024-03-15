@@ -1,138 +1,83 @@
-import { SuiClient, getFullnodeUrl } from '@mysten/sui.js/client';
-import { TransactionBlock } from '@mysten/sui.js/transactions';
-import { MIST_PER_SUI, fromB64, fromHEX } from '@mysten/sui.js/utils';
-// import { JsonRpcProvider, testnetConnection } from '@mysten/sui.js';
-
-import { Ed25519Keypair } from '@mysten/sui.js/keypairs/ed25519';
-
-
-
-
-const suiClient = new SuiClient({ url: getFullnodeUrl('testnet')});
-
-
-const txb = new TransactionBlock();
-
-
-const ADDRESS_User = '0x6060640454e670a0efb91c896a7ee4f3d5781c9b489f9962640873d1f2b8c961';
-const PACKAGE_ID = '0xaafa4058de49a7fb79d450c61e33ee03033c7c21634b24b73e0bf2a021798725'
-
-
-// path to an event that is emitted in the init function of the kiosk_practice contract
-const MoveEventType = '{PACKAGE_ID}::kiosk_practice::InitEvent';
-
-
-// RPC for testnet
-// const provider = new JsonRpcProvider(testnetConnection);
-
-
-const balance = (balance) => {
-	return Number.parseInt(balance.totalBalance) / Number(MIST_PER_SUI);
-};
+// imports
+import { getFullnodeUrl, SuiClient, SuiHTTPTransport  } from "@mysten/sui.js/client";
+import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
+import { TransactionBlock } from "@mysten/sui.js/transactions";
+import wallet from './dev-wallet.json' assert { type: 'json' };
+import { WebSocket } from 'ws';
 
 
 
-const acctBalance = await suiClient.getBalance({
-	owner: ADDRESS_User,
+// generate a keypair
+const privateKeyArray = wallet.privateKey.split(',').map(num => parseInt(num, 10));
+const privateKeyBytes = new Uint8Array(privateKeyArray);
+const keypair = Ed25519Keypair.fromSecretKey(privateKeyBytes);
+
+
+console.log(`Public Key raw bytes: ${keypair.getPublicKey().toRawBytes()}`);
+
+console.log(`Secret Key to raw bytes: ${privateKeyBytes}`);
+
+
+console.log(`Public Key: ${keypair.getPublicKey().toSuiAddress()}`);
+
+
+
+
+
+
+
+// client
+const client = new SuiClient({
+    transport: new SuiHTTPTransport({
+        url: getFullnodeUrl('testnet'),
+        WebSocketConstructor: WebSocket
+    }),
 });
 
 
 
-// create coin object that is equalt to the cost of a prediction
-const [coin] = txb.splitCoins(txb.gas, [10000000]);
+
+
+
+(async () => {
+    try {
+     
+        
+        // create Transaction Block
+        const txb = new TransactionBlock();
+        
+
+       
+
+       
+
+    
+
+
+        
 
 
 
 
-// console.log(
-//     await provider.getObject({
-//         id: Package,
-//         options: { showPreviousTransaction: true },
-//     }),
-// );
 
 
 
-
-// // subscribe to events for the package
-// let unsubscribe = await provider.subscribeEvent({
-//     filter: { PACKAGE_ID },
-//     onMessage: (event) => {
-//         console.log("subscribeEvent", JSON.stringify(event, null, 2))
-//     }
-// });
-
+        
+        // finalize the transaction block
+        let txid = await client.signAndExecuteTransactionBlock({
+            signer: keypair,
+            transactionBlock: txb,
+        });
+        
 
 
-
-// // call the set_predict_epoch function in the kiosk_practice contract
-// const [kiosk, kiosk_owner_cap] = txb.moveCall({
-//     target: '0xaafa4058de49a7fb79d450c61e33ee03033c7c21634b24b73e0bf2a021798725::kiosk_practice::create_kiosk',
-//     arguments: [],
-// });
+        // log the transaction result
+        console.log(`Transaction result: ${JSON.stringify(txid, null, 2)}`);
+        console.log(`success: https://suiexplorer.com/txblock/${txid.digest}?network=testnet`);
 
 
 
-
-// call the set_predict_epoch function in the kiosk_practice contract
-// const predict_epoch = txb.moveCall({
-//     target: '0xaafa4058de49a7fb79d450c61e33ee03033c7c21634b24b73e0bf2a021798725::kiosk_practice::set_predict_epoch',
-//     arguments: [ 2, 555 ],
-// });
-
-
-
-// // call the set_report_epoch function in the kiosk_practice contract
-// const report_epoch = txb.moveCall({
-//     target: '0xaafa4058de49a7fb79d450c61e33ee03033c7c21634b24b73e0bf2a021798725::kiosk_practice::set_report_epoch',
-//     arguments: [ 555, 777 ],
-// });
-
-
-
-// // call the set_report_epoch function in the kiosk_practice contract
-// const game = txb.moveCall({
-//     target: '0xaafa4058de49a7fb79d450c61e33ee03033c7c21634b24b73e0bf2a021798725::kiosk_practice::start_game',
-//     arguments: [ 555, 777 ],
-// });
-
-
-// const keypair = new Ed25519Keypair();
-// const pubKey = keypair.getPublicKey().toSuiAddress();
-// const pubKeyBytes = keypair.getPublicKey().toRawBytes();
-
-
-// const  privKeypairDecoded = keypair.decodeSuiPrivateKey(privkey);
-
-// console.log(
-// 	`public key: ${ pubKey }`
-// );
-
-
-
-// console.log(
-// 	`private key as bech32: ${ privkey }`
-// );
-
-
-
-
-// console.log(
-// 	`private key as keypair: ${ privKeypairDecoded }`
-// );
-
-const pk = "suiprivkey1qp8sxjyrhju8q86t53hthmunx6vz4el77l8044r2j9vehak6qdarq4yud7x"
-// const kp_import = Ed25519Keypair.fromSecretKey(fromHex("0xd463e11c7915945e86ac2b72d88b8190cfad8ff7b48e7eb892c275a5cf0a3e82"));
-
-// const MNEMONICS = "treat rain attract net shiver try disagree veteran minimum unfold borrow ice"
-
-// const kp_derive_0 = Ed25519Keypair.deriveKeypair({MNEMONICS});
-
-
-// console.log(
-//     `path: ${ balance(kp_derive_0) }`
-// )
-
-console.log(
-    `acct balance: ${ balance(acctBalance) }`
-)
+    } catch (e) {
+        console.error(`error: ${e}`);
+    }
+})();

@@ -19,7 +19,6 @@ console.log(`Public Key raw bytes: ${keypair.getPublicKey().toRawBytes()}`);
 console.log(`Public Key: ${keypair.getPublicKey().toSuiAddress()}`);
 
 
-const PACKAGE_ID = "0xd32b20876598c0d1c903a2834c857278435c8da704a6e2183c6e1c704eb72efe";
 const itemType = '0xd32b20876598c0d1c903a2834c857278435c8da704a6e2183c6e1c704eb72efe::kiosk_practice::Prediction';
 
 
@@ -59,11 +58,6 @@ const getCap = async () => {
         const txb = new TransactionBlock();
         
 
-       
-
-       
-
-    
 
         // create Kiosk TxBlock
         const kioskTx = new KioskTransaction({ kioskClient, transactionBlock: txb, cap: await getCap() });
@@ -117,24 +111,9 @@ const getCap = async () => {
 
 
 
-        // list the prediction in the kiosk
-        // kioskTx.list({
-        //     itemType: prediction,
-        //     itemId: prediction_id,
-        //     price: 1000000,
-        // });
+    
 
-
-
-
-        // delist the prediction in the kiosk
-        // kioskTx.delist({
-        //     itemType: prediction,
-        //     itemId: prediction_id,
-        // });
-
-
-
+     
 
         // take the prediction from the kiosk
         kioskTx.take({
@@ -145,14 +124,6 @@ const getCap = async () => {
 
 
 
-        // delete the prediction (works)
-        // txb.moveCall({
-        //     target: '0xd32b20876598c0d1c903a2834c857278435c8da704a6e2183c6e1c704eb72efe::kiosk_practice::delete_prediction',
-        //     arguments: [ txb.object(prediction)],
-        // });
-
-
-
 
         kioskTx.shareAndTransferCap(keypair.getPublicKey().toRawBytes());
 
@@ -160,28 +131,6 @@ const getCap = async () => {
         kioskTx.finalize();
         
         
-
-
-
-
-
-        // subscribe to events for the package
-        // let unsubscribe = await client.subscribeEvent({
-        //     filter: { All },
-        //     onMessage: (event) => {
-        //         console.log("subscribeEvent", JSON.stringify(event, null, 2))
-        //     }
-        // });
-
-
-       
-
-
-
-
-
-
-
 
 
 
