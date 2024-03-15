@@ -76,7 +76,7 @@ const getCap = async () => {
         const predict_end_time = 555;
 
         
-        // make a prediction
+        // make a epoch (works)
         const predict_epoch = txb.moveCall({
             target: '0xd32b20876598c0d1c903a2834c857278435c8da704a6e2183c6e1c704eb72efe::kiosk_practice::set_predict_epoch',
             arguments: [ txb.pure.u64(predict_start_time), txb.pure.u64(predict_end_time) ],
@@ -85,7 +85,7 @@ const getCap = async () => {
 
         
 
-        // delete the prediction
+        // delete the epoch (works)
         txb.moveCall({
             target: '0xd32b20876598c0d1c903a2834c857278435c8da704a6e2183c6e1c704eb72efe::kiosk_practice::delete_epoch',
             arguments: [ txb.object(predict_epoch)],
@@ -98,39 +98,58 @@ const getCap = async () => {
         const guess = 232;
         let clock = "0x6"
 
-        // make a prediction
+        // make a prediction (works)
         const prediction = txb.moveCall({
             target: '0xd32b20876598c0d1c903a2834c857278435c8da704a6e2183c6e1c704eb72efe::kiosk_practice::make_prediction',
             arguments: [ txb.pure.u64(guess), txb.object(clock)],
         });
 
 
-
-        // delete a prediction
-        txb.moveCall({
-            target: '0xd32b20876598c0d1c903a2834c857278435c8da704a6e2183c6e1c704eb72efe::kiosk_practice::delete_prediction',
-            arguments: [ txb.object(prediction)],
+        
+        const itemType = '0xd32b20876598c0d1c903a2834c857278435c8da704a6e2183c6e1c704eb72efe::kiosk_practice::Prediction';
+    
+        // place a prediction in the kiosk
+        const prediction_id = kioskTx.place({
+            item: txb.object(prediction),
+            itemType: itemType,
         });
 
 
 
 
-        // place a prediction in the kiosk
-        // kioskTx.place({
-        //     itemType: prediction,
-        //     item: 'Prediction',
-        // });
-
-
-
+        // list the prediction in the kiosk
         // kioskTx.list({
         //     itemType: prediction,
-        //     item: 'Prediction',
+        //     itemId: prediction_id,
         //     price: 1000000,
         // });
 
 
 
+
+        // delist the prediction in the kiosk
+        // kioskTx.delist({
+        //     itemType: prediction,
+        //     itemId: prediction_id,
+        // });
+
+
+
+
+        // take the prediction from the kiosk
+        // kioskTx.take({
+        //     itemType: prediction,
+        //     itemId: prediction_id,
+        // });
+
+
+
+
+        // delete the prediction (works)
+        // txb.moveCall({
+        //     target: '0xd32b20876598c0d1c903a2834c857278435c8da704a6e2183c6e1c704eb72efe::kiosk_practice::delete_prediction',
+        //     arguments: [ txb.object(prediction)],
+        // });
 
 
 
