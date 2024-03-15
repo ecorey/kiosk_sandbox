@@ -48,6 +48,7 @@ const pk_two = keyPair_two.getSecretKey();
 
 console.log(`Private Key 2: ${pk_two}`);
 
+// get pkey encoded from the secretKey function then decode it
 const secKey_two = 'suiprivkey1qzj5dtex3nv4qz7mjerzrkv4yyhrm6uxmpt5hyfk9jft5qyqjcat2rfst8m';
 
 
