@@ -131,10 +131,10 @@ const getCapWalletOne = async () => {
         const game_result = 232;
 
         // end the game (works)
-        txb.moveCall({
-            target: '0xa5e20fbc457babd65e5d1927d7d20451a6681e3ae0751703dfea0da129f5e33e::kiosk_practice::close_game',
-            arguments: [ txb.object(end_game_cap), txb.object(game_id), txb.pure.u64(game_result)],
-        });
+        // txb.moveCall({
+        //     target: '0xa5e20fbc457babd65e5d1927d7d20451a6681e3ae0751703dfea0da129f5e33e::kiosk_practice::close_game',
+        //     arguments: [ txb.object(end_game_cap), txb.object(game_id), txb.pure.u64(game_result)],
+        // });
 
 
 
