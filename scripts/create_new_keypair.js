@@ -19,7 +19,7 @@ import { decodeSuiPrivateKey } from '@mysten/sui.js/cryptography';
 
 
 // generate a keypair from mnemonic
-const exampleMnemonic = 'weather settle body token aisle use dignity learn spray tree attitude drop';
+const exampleMnemonic = '';
  
 const keyPair_one = Ed25519Keypair.deriveKeypair(exampleMnemonic);
 
@@ -41,7 +41,7 @@ console.log(`Private Key One: ${pk_one}`);
 
 
 // get pkey encoded from the secretKey function then decode it
-const secKey_one = 'suiprivkey1qrrv3jx8wjnyxcjvx0j9w8je8ecn4nm8hkq54qlxqlgg7dekff4puvzmxa5';
+const secKey_one = '';
 
 const secKey  = decodeSuiPrivateKey(secKey_one);
 
