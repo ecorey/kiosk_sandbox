@@ -24,23 +24,23 @@ const keypairdev = Ed25519Keypair.fromSecretKey(privateKeyBytes);
 
 
 // CONSTS
-const PACKAGE_ID = "0x94c8171fd7978a6ab311f8bd6f9269b5ea0d337c3ab5c38c3fca778e40d1e992";
+const PACKAGE_ID = "0x33bc9889f0b844a240b7c98e9d5571d6c154c74426da92e3dc9429d6c7a27450";
 const itemType = `${PACKAGE_ID}::kiosk_practice::Prediction`;
 
 // pub key for wallet-three used to publish the package
 const devPubwallet = "0x07095af51002db0e9be284b8dab97263f77fec2a1be68cd42b7dd2358a6eccdd";
-const tx_block = "FnmPTA94PRDEaNbqMdZHVSQjcFatJiL2hg82EzLMbzev";
+const tx_block = "";
 
 // const for the move calls
 const clock = "0x6";
 
 //  created in init
-const start_game_cap = "0x3329d892922305b8c6d4665b6a85f70201097d6f7e199544d248e1f8d080a31a";
-const end_game_cap = "0xf555c89e1df736f752a6cd72f85ac06b7c402ef73ba36c90e245eb0e87b74032";
-const game_owner_cap = "0x3d76f965ac3e057a0ed18023482a146fc6d1c23143a767a956cb34bda4b81f43";
-const transfer_policy_cap = "0xea7ed3d8275c99f3bc3f7c826850ed26a0be3ee1465def188cf93a9225429b58";
-const publisher = "0x596d7621cb31c9c926ae8848981c5062624e96c05ccb7f2a1bf953371058405f";
-const upgrade_cap = "0x5c1c1687f7a4a7a738b58e940eb3d6d760c148d720924b8b12d1b8ddbf4fc4aa";
+const start_game_cap = "0xf144f5bee4a401efd5efbf6f16c9209362b9248b667979b678ad59117d2444b3";
+const end_game_cap = "0xf347525fb401c8433cfab3771fffae980366c9ec4b8b493578c010e9921bf084";
+const game_owner_cap = "0x965db27ef9ce407464b28009dc8bd5f438b38287a80d99ffbb0e0262be5813f9";
+const transfer_policy_cap = "0x67d6d5ccb164201444030f26cf917d70848d7f4d896f70788acac4b390b2050b";
+const publisher = "0x0b474c2637fb421b36fde2497307b402f071224d1ee9974f349d3b548e48fc21";
+const upgrade_cap = "0x58ee86ee24b5be8e1a86a8bc18af4ef15f711a774e379edfd0e9f1e3143ef7d9";
 
 
 const game_id ="";
@@ -75,18 +75,22 @@ const client = new SuiClient({
 
         // GET THE CURRENT TIME
 
-        const current_time = txb.moveCall({
-            target: `${PACKAGE_ID}::kiosk_practice::get_time`,
-            arguments: [ ],
-        });
-
-
-        console.log(`Current Time: ${current_time}`);
-
+        async function logCurrentTime() {
+            await txb.moveCall({
+                target: `${PACKAGE_ID}::kiosk_practice::get_time`,
+                arguments: [txb.object(clock)],
+            });
         
+            
+           
+           
+        }
 
-
-
+        // return the current time in event log
+        // 1710618180870
+        logCurrentTime();
+        
+        
 
         // CREATE PREDICT EPOCH AND REPORT EPOCH
 
