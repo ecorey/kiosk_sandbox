@@ -2,7 +2,7 @@
 import { getFullnodeUrl, SuiClient, SuiHTTPTransport  } from "@mysten/sui.js/client";
 import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
 import { TransactionBlock } from "@mysten/sui.js/transactions";
-import walletDev from './wallet-four.json' assert { type: 'json' };
+import walletDev from './wallet-three.json' assert { type: 'json' };
 
 import { WebSocket } from 'ws';
 
@@ -26,23 +26,24 @@ const keypairdev = Ed25519Keypair.fromSecretKey(privateKeyBytes);
 
 
 // CONSTS
-const PACKAGE_ID = "0x3f2ec0acc12fe2c962159592053673662ef9004b18c3c68326f01b584445f684";
+const PACKAGE_ID = "";
 const itemType = `${PACKAGE_ID}::kiosk_practice::Prediction`;
 
 // pub key for wallet-three used to publish the package
-const devPubwallet = "0xf84965aee90c0e4d56a9658d78ecbc01e7908cab78cad6a62bcc558171cd2b34";
-const tx_block = "CiTmTtgs6CU2hBaB1UXRBeKsnQ8cYwsPzhsBNp4memib";
+const devPubwallet = "";
+const tx_block = "";
 
 // const for the move calls
 const clock = "0x6";
 
 //  created in init
-const start_game_cap = "0x7dc9e5dcf72bbccdddf48423177a4d57435ffbff105e28c4595cb29381a54ab7";
-const end_game_cap = "0x1f2bade86193e96ffda527360b64280bacecb0f4370e0e799f4914429d10d468";
-const game_owner_cap = "0x697dfd73e9b45377f15f3a7f691433ef9b187acdea6d7fbd34a55f7488ae8724";
-const transfer_policy_cap = "0xb5cdb4f6a2be49382ef94c1b71bdd8c79677b1e29f859835a71b616dd22ad9be";
-const publisher = "0xa0570688d80d8f0e711f1f560eec6b4aad17022fb7462cdc72fcd3dc8a8206c3";
-const upgrade_cap = "0x357fa48cfaf28aeb217fcc28c046d192f6c736c2e424bcb49af8fd420d564a7a";
+const start_game_cap = "";
+const end_game_cap = "";
+const game_owner_cap = "";
+const transfer_policy = "";
+const transfer_policy_cap = "";
+const publisher = "";
+const upgrade_cap = "";
 
 
 // TIME STAMPS (election event on Nov. 5)
@@ -61,7 +62,7 @@ const report_end_time = 1733011200000;
 const game_price = 1000000;
 
 
-const game_id ="0x49c661ad26617aa4f3022dc0267f338c2f1f2b7513fbca3cdd20e6d1b814244c";
+const game_id ="";
 
 
 
@@ -76,6 +77,12 @@ const client = new SuiClient({
 });
 
 
+const ownerAddress = ''; 
+
+
+
+// const coins = await client.getCoins({ owner: ownerAddress });
+// console.log(`Coins owned by ${ownerAddress}:`, JSON.stringify(coins, null, 2));
 
 
 
@@ -89,17 +96,21 @@ const client = new SuiClient({
 
 
 
+
+
+
+
         // GET THE CURRENT TIME
 
-        // async function logCurrentTime() {
-        //     await txb.moveCall({
-        //         target: `${PACKAGE_ID}::kiosk_practice::get_time`,
-        //         arguments: [txb.object(clock)],
-        //     });
+        async function logCurrentTime() {
+            await txb.moveCall({
+                target: `${PACKAGE_ID}::kiosk_practice::get_time`,
+                arguments: [txb.object(clock)],
+            });
            
-        // }
+        }
 
-        // await logCurrentTime();
+        await logCurrentTime();
         
         
 
@@ -169,7 +180,7 @@ const client = new SuiClient({
 
 
 
-        
+
 
         //WITHDRAW THE BALANCE FROM THE GAME
 
@@ -243,7 +254,7 @@ const client = new SuiClient({
         
 
 
-        // log the transaction result
+        // // log the transaction result
         console.log(`Transaction result: ${JSON.stringify(txid, null, 2)}`);
         console.log(`success: https://suiexplorer.com/txblock/${txid.digest}?network=testnet`);
 
