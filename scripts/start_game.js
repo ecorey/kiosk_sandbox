@@ -43,6 +43,19 @@ const publisher = "0x0b474c2637fb421b36fde2497307b402f071224d1ee9974f349d3b548e4
 const upgrade_cap = "0x58ee86ee24b5be8e1a86a8bc18af4ef15f711a774e379edfd0e9f1e3143ef7d9";
 
 
+// TIME STAMPS (election event on Nov. 5)
+// get from get time event log
+const predict_start_time = 1710618180870;
+// November 3, 2024, at 12:00 AM (GMT)
+const predict_end_time = 1730592000000;
+
+
+// November 10, 2024 at 12:00 AM (GMT)
+const report_start_time = 1731196800000;
+// December 1, 2024 at 12:00 AM (GMT)
+const report_end_time = 1733011200000;
+ 
+
 const game_id ="";
 
 
@@ -88,17 +101,16 @@ const client = new SuiClient({
 
         // return the current time in event log
         // 1710618180870
+        // to add days to the timestamp so that is nov 10 2024 at 12:00 am: 1731196800000
         logCurrentTime();
         
         
 
         // CREATE PREDICT EPOCH AND REPORT EPOCH
 
-        // const predict_start_time = 22;
-        // const predict_end_time = 555;
+        
 
-        // const report_start_time = 555;
-        // const report_end_time = 777;
+  
         
 
         // const predict_epoch = txb.moveCall({
