@@ -12,7 +12,6 @@ export const walletTwoRef = "0xe5f5e09892328ff278b473f485cbf85cef8a9958112023c84
 
 export const walletThreeRef = "0x07095af51002db0e9be284b8dab97263f77fec2a1be68cd42b7dd2358a6eccdd";
 
-// clean wallet
 export const walletFourRef = "0xf84965aee90c0e4d56a9658d78ecbc01e7908cab78cad6a62bcc558171cd2b34";
 
 // clean wallet
