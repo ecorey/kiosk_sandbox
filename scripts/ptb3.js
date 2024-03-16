@@ -98,17 +98,17 @@ const getCapWalletOne = async () => {
 
 
         // make a predict epoch (works)
-        const predict_epoch = txb.moveCall({
-            target: '0xa5e20fbc457babd65e5d1927d7d20451a6681e3ae0751703dfea0da129f5e33e::kiosk_practice::set_predict_epoch',
-            arguments: [ txb.pure.u64(predict_start_time), txb.pure.u64(predict_end_time) ],
-        });
+        // const predict_epoch = txb.moveCall({
+        //     target: '0xa5e20fbc457babd65e5d1927d7d20451a6681e3ae0751703dfea0da129f5e33e::kiosk_practice::set_predict_epoch',
+        //     arguments: [ txb.pure.u64(predict_start_time), txb.pure.u64(predict_end_time) ],
+        // });
 
 
-        // make a report epoch
-        const report_epoch = txb.moveCall({
-            target: '0xa5e20fbc457babd65e5d1927d7d20451a6681e3ae0751703dfea0da129f5e33e::kiosk_practice::set_report_epoch',
-            arguments: [ txb.pure.u64(report_start_time), txb.pure.u64(report_end_time) ],
-        });
+        // make a report epoch (works)
+        // const report_epoch = txb.moveCall({
+        //     target: '0xa5e20fbc457babd65e5d1927d7d20451a6681e3ae0751703dfea0da129f5e33e::kiosk_practice::set_report_epoch',
+        //     arguments: [ txb.pure.u64(report_start_time), txb.pure.u64(report_end_time) ],
+        // });
 
 
 
@@ -119,24 +119,29 @@ const getCapWalletOne = async () => {
         const game_price = 1000000;
         let clock = "0x6"
 
-        // start the game
-        const new_game = txb.moveCall({
-            target: '0xa5e20fbc457babd65e5d1927d7d20451a6681e3ae0751703dfea0da129f5e33e::kiosk_practice::start_game',
-            arguments: [ txb.object(start_game_cap), txb.pure.u64(game_price), txb.object(predict_epoch), txb.object(report_epoch), txb.object(clock)],
+        // start the game (works)
+        // const new_game = txb.moveCall({
+        //     target: '0xa5e20fbc457babd65e5d1927d7d20451a6681e3ae0751703dfea0da129f5e33e::kiosk_practice::start_game',
+        //     arguments: [ txb.object(start_game_cap), txb.pure.u64(game_price), txb.object(predict_epoch), txb.object(report_epoch), txb.object(clock)],
+        // });
+
+
+        const game_id ="0x51edb7e206470dfc24a65dad9003d5d6b3d7d22f402100230c20ae27c3e95f98";
+        
+        const game_result = 232;
+
+        // end the game (works)
+        txb.moveCall({
+            target: '0xa5e20fbc457babd65e5d1927d7d20451a6681e3ae0751703dfea0da129f5e33e::kiosk_practice::close_game',
+            arguments: [ txb.object(end_game_cap), txb.object(game_id), txb.pure.u64(game_result)],
         });
 
 
 
+
         
-        // const game_result = 232;
 
-        // end the game
-        // txb.moveCall({
-        //     target: '0xa5e20fbc457babd65e5d1927d7d20451a6681e3ae0751703dfea0da129f5e33e::kiosk_practice::close_game',
-        //     arguments: [ txb.object(end_game_cap), txb.object(new_game), txb.pure.u64(game_result)],
-        // });
 
-    
 
         // // create Kiosk TxBlock for the user who will place a prediction
         // const kioskTx = new KioskTransaction({ kioskClient, transactionBlock: txb, cap: await getCapWalletOne() });
