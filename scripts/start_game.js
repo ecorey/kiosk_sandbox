@@ -2,7 +2,7 @@
 import { getFullnodeUrl, SuiClient, SuiHTTPTransport  } from "@mysten/sui.js/client";
 import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
 import { TransactionBlock } from "@mysten/sui.js/transactions";
-import walletDev from './wallet-three.json' assert { type: 'json' };
+import walletDev from './wallet-four.json' assert { type: 'json' };
 
 import { WebSocket } from 'ws';
 
@@ -15,37 +15,39 @@ const keypairdev = Ed25519Keypair.fromSecretKey(privateKeyBytes);
 
 
 // PUBLISH MOVE CONTRACT THEN SET THE TARGET AND UPDATE MOVE CALLS TO USE THE NEW TARGET
+// SET: the consts
 // GET: current time
-// CREATE: predict epoch and report epoch with the correct times
-// GET: start game cap, predict epoch and report epoch ids and use them to start the game
+// CREATE: predict epoch and report epoch with the correct times and use them to start the game
+// GET: the game balance
+
 // CLOSE: the game with the game id and a game result
 // WITHDRAW: balance from the game
 // DELETE: the game cap 
 
 
 // CONSTS
-const PACKAGE_ID = "0x33bc9889f0b844a240b7c98e9d5571d6c154c74426da92e3dc9429d6c7a27450";
+const PACKAGE_ID = "0x3f2ec0acc12fe2c962159592053673662ef9004b18c3c68326f01b584445f684";
 const itemType = `${PACKAGE_ID}::kiosk_practice::Prediction`;
 
 // pub key for wallet-three used to publish the package
-const devPubwallet = "0x07095af51002db0e9be284b8dab97263f77fec2a1be68cd42b7dd2358a6eccdd";
-const tx_block = "";
+const devPubwallet = "0xf84965aee90c0e4d56a9658d78ecbc01e7908cab78cad6a62bcc558171cd2b34";
+const tx_block = "CiTmTtgs6CU2hBaB1UXRBeKsnQ8cYwsPzhsBNp4memib";
 
 // const for the move calls
 const clock = "0x6";
 
 //  created in init
-const start_game_cap = "0xf144f5bee4a401efd5efbf6f16c9209362b9248b667979b678ad59117d2444b3";
-const end_game_cap = "0xf347525fb401c8433cfab3771fffae980366c9ec4b8b493578c010e9921bf084";
-const game_owner_cap = "0x965db27ef9ce407464b28009dc8bd5f438b38287a80d99ffbb0e0262be5813f9";
-const transfer_policy_cap = "0x67d6d5ccb164201444030f26cf917d70848d7f4d896f70788acac4b390b2050b";
-const publisher = "0x0b474c2637fb421b36fde2497307b402f071224d1ee9974f349d3b548e48fc21";
-const upgrade_cap = "0x58ee86ee24b5be8e1a86a8bc18af4ef15f711a774e379edfd0e9f1e3143ef7d9";
+const start_game_cap = "0x7dc9e5dcf72bbccdddf48423177a4d57435ffbff105e28c4595cb29381a54ab7";
+const end_game_cap = "0x1f2bade86193e96ffda527360b64280bacecb0f4370e0e799f4914429d10d468";
+const game_owner_cap = "0x697dfd73e9b45377f15f3a7f691433ef9b187acdea6d7fbd34a55f7488ae8724";
+const transfer_policy_cap = "0xb5cdb4f6a2be49382ef94c1b71bdd8c79677b1e29f859835a71b616dd22ad9be";
+const publisher = "0xa0570688d80d8f0e711f1f560eec6b4aad17022fb7462cdc72fcd3dc8a8206c3";
+const upgrade_cap = "0x357fa48cfaf28aeb217fcc28c046d192f6c736c2e424bcb49af8fd420d564a7a";
 
 
 // TIME STAMPS (election event on Nov. 5)
 // get from get time event log
-const predict_start_time = 1710618180870;
+const predict_start_time = 1710621232132;
 // November 3, 2024, at 12:00 AM (GMT)
 const predict_end_time = 1730592000000;
 
@@ -56,7 +58,10 @@ const report_start_time = 1731196800000;
 const report_end_time = 1733011200000;
  
 
-const game_id ="";
+const game_price = 1000000;
+
+
+const game_id ="0x49c661ad26617aa4f3022dc0267f338c2f1f2b7513fbca3cdd20e6d1b814244c";
 
 
 
@@ -84,34 +89,25 @@ const client = new SuiClient({
 
 
 
-
-
         // GET THE CURRENT TIME
 
-        async function logCurrentTime() {
-            await txb.moveCall({
-                target: `${PACKAGE_ID}::kiosk_practice::get_time`,
-                arguments: [txb.object(clock)],
-            });
-        
-            
+        // async function logCurrentTime() {
+        //     await txb.moveCall({
+        //         target: `${PACKAGE_ID}::kiosk_practice::get_time`,
+        //         arguments: [txb.object(clock)],
+        //     });
            
-           
-        }
+        // }
 
-        // return the current time in event log
-        // 1710618180870
-        // to add days to the timestamp so that is nov 10 2024 at 12:00 am: 1731196800000
-        logCurrentTime();
+        // await logCurrentTime();
         
         
+
+
+
+
 
         // CREATE PREDICT EPOCH AND REPORT EPOCH
-
-        
-
-  
-        
 
         // const predict_epoch = txb.moveCall({
         //     target: `${PACKAGE_ID}::kiosk_practice::set_predict_epoch`,
@@ -129,10 +125,8 @@ const client = new SuiClient({
 
 
         // START THE GAME
-
-        // const game_price = 1000000;
         
-        // const new_game = txb.moveCall({
+        // txb.moveCall({
         //     target: `${PACKAGE_ID}::kiosk_practice::start_game`,
         //     arguments: [ txb.object(start_game_cap), txb.pure.u64(game_price), txb.object(predict_epoch), txb.object(report_epoch), txb.object(clock)],
         // });
@@ -143,17 +137,39 @@ const client = new SuiClient({
 
         // GET THE GAME BALANCE
 
-        // const game_balance = txb.moveCall({
+        // async function logGameBalance() {
+            
+        //     const game_balance = await txb.moveCall({
         //         target: `${PACKAGE_ID}::kiosk_practice::get_game_balance`,
-        //         arguments: [ ],
+        //         arguments: [ txb.object(game_id) ],
         //     });
 
+        //     const bal = game_balance[1];
+        //     const a = bal.index;
 
-        // console.log(`Game balance: ${game_balance}`)
+        //     console.log(`Game balance: ${a}`);
+           
+        // }
+
+        // await logGameBalance();
+        
+        
 
 
 
 
+        // ADD A BALANCE TO THE GAME
+
+        // const amount_to_add = 2000000;
+
+        // txb.moveCall({
+        //     target: `${PACKAGE_ID}::kiosk_practice::add_game_balance`,
+        //     arguments: [ txb.object(game_id), txb.pure.u64(amount_to_add) ],
+        // });
+
+
+
+        
 
         //WITHDRAW THE BALANCE FROM THE GAME
 
@@ -233,7 +249,13 @@ const client = new SuiClient({
 
 
 
+        console.log(`END OF SCRIPT`);
+
     } catch (e) {
         console.error(`error: ${e}`);
     }
 })();
+
+
+
+

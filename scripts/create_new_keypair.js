@@ -41,11 +41,11 @@ console.log(`Private Key One: ${pk_one}`);
 
 
 // get pkey encoded from the secretKey function then decode it
-const secKey_one = '';
+// const secKey_one = '';
 
-const secKey  = decodeSuiPrivateKey(secKey_one);
+// const secKey  = decodeSuiPrivateKey(secKey_one);
 
-console.log(`Private Key One to raw bytes: ${secKey.secretKey}`);
+// console.log(`Private Key One to raw bytes: ${secKey.secretKey}`);
 
 
 console.log(`END OF SCRIPT`);
