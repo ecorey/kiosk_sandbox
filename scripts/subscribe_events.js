@@ -4,6 +4,7 @@ import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
 import { WebSocket } from 'ws';
 import walletDev from './wallet-four.json' assert { type: 'json' };
 
+import {  PACKAGE } from './config.js';
 
 
 // Initialize keypair
@@ -13,8 +14,12 @@ const keypairdev = Ed25519Keypair.fromSecretKey(privateKeyBytes);
 
 
 
-// Constants
-const Package = "0xf5733f359175cb8f6b08fdc927a7dab4680d2255788a83f9afbe748d08602b99";
+// contract events
+const eventsToSubscribe = [
+    `${PACKAGE}::kiosk_practice::TimeEvent`,
+    `${PACKAGE}::kiosk_practice::GameStarted`,
+    `${PACKAGE}::kiosk_practice::PredictionMade`,
+];
 
 
 
@@ -30,19 +35,20 @@ const client = new SuiClient({
 
 
 
+
+
+
 (async () => {
     try {
-
-
-        console.log(
-            await client.getObject({
-                id: Package,
-                options: { showPreviousTransaction: true },
-            }),
-        );
+     
+        
+        // create Transaction Block
+        const txb = new TransactionBlock();
 
 
 
+
+        
 
         // let unsubscribe = await client.subscribeEvent({
         //     filter: { Package },
@@ -59,17 +65,33 @@ const client = new SuiClient({
 
 
 
+
+
+
+      
+
         
+        // finalize the transaction block
+        let txid = await client.signAndExecuteTransactionBlock({
+            signer: keypairdev,
+            transactionBlock: txb,
+        });
+        
+
+
+        // log the transaction result
+        console.log(`Transaction result: ${JSON.stringify(txid, null, 2)}`);
+        console.log(`success: https://suiexplorer.com/txblock/${txid.digest}?network=testnet`);
+
 
 
         console.log(`END OF SCRIPT`);
 
-        
     } catch (e) {
         console.error(`error: ${e}`);
     }
-
 })();
+
 
 
 
