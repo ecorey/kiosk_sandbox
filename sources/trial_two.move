@@ -494,7 +494,7 @@ module kiosk_practice::kiosk_practice {
    
 
 
-   public fun make_prediction( predict: u64, clock: &Clock, ctx: &mut TxContext) : Prediction {
+   public fun make_prediction( predict: u64, clock: &Clock, ctx: &mut TxContext)  {
         
       
         event::emit(PredictionMade {
@@ -514,7 +514,7 @@ module kiosk_practice::kiosk_practice {
         };
 
 
-        prediction
+        transfer::public_transfer(prediction, tx_context::sender(ctx));
        
     }
 

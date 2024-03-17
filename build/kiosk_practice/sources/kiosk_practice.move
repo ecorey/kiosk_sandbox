@@ -83,8 +83,7 @@
 
 
 
-/// USE EPOCH AS TIMESTAMP?
-//  epoch 311 started Mar 16, 11:20 AM
+
 
 
 module kiosk_practice::kiosk_practice {
@@ -158,6 +157,11 @@ module kiosk_practice::kiosk_practice {
     }
 
 
+    struct GameOpen has copy, drop {
+        game_open: bool,
+    }
+
+
 
     // struct to hold a game instance
     struct Game has key, store {
@@ -200,6 +204,7 @@ module kiosk_practice::kiosk_practice {
     }
 
     
+
     public fun get_time(clock: &Clock)  {
         event::emit(TimeEvent {
             timestamp_ms: clock::timestamp_ms(clock),
@@ -240,6 +245,11 @@ module kiosk_practice::kiosk_practice {
         });
 
 
+        event::emit(GameOpen {
+            game_open: true,
+        });
+
+
         let game = new_game(price, predict_epoch, report_epoch, ctx);
         
         transfer::share_object(game);
@@ -258,6 +268,11 @@ module kiosk_practice::kiosk_practice {
         game_instance.game_closed = true;
         
         // switchboard_oracle::save_aggregator_info(aggregator, ctx);
+
+        event::emit(GameOpen {
+            game_open: false,
+        });
+
 
         let EndGameCap { id } = end_game_cap;
         object::delete(id);
@@ -369,11 +384,7 @@ module kiosk_practice::kiosk_practice {
 
 
 
-    // deletes the epoch
-    public fun delete_epoch(epoch: Epoch, ctx: &mut TxContext) {
-        let Epoch { id, start_time: _, end_time: _ } = epoch;
-        object::delete(id);
-    }
+    
 
 
 
@@ -483,7 +494,7 @@ module kiosk_practice::kiosk_practice {
    
 
 
-   public fun make_prediction( predict: u64, clock: &Clock, ctx: &mut TxContext) : Prediction {
+   public fun make_prediction( predict: u64, clock: &Clock, ctx: &mut TxContext)  {
         
       
         event::emit(PredictionMade {
@@ -503,20 +514,14 @@ module kiosk_practice::kiosk_practice {
         };
 
 
-        prediction
+        transfer::public_transfer(prediction, tx_context::sender(ctx));
        
     }
 
 
 
 
-    // deletes the prediction
-    public fun delete_prediction(prediction: Prediction, ctx: &mut TxContext) {
-
-        let Prediction { id, prediction_id: _, prediction: _, timestamp: _ } = prediction;
-        object::delete(id);
-
-    }
+   
 
 
 
@@ -571,6 +576,7 @@ module kiosk_practice::kiosk_practice {
 
 
 
+
     
     // ###################
     // WITHDRAW FUNCTIONS#
@@ -590,8 +596,9 @@ module kiosk_practice::kiosk_practice {
 
 
 
+
     // withdraw from game balance
-   public fun withdraw_balance_from_game(_: &GameOwnerCap, game: &mut Game, amount: u64, ctx: &mut TxContext) {
+    public fun withdraw_balance_from_game(_: &GameOwnerCap, game: &mut Game, amount: u64, ctx: &mut TxContext) {
        
         assert!(game.game_closed, EGameNotClosed);  
         
@@ -611,10 +618,32 @@ module kiosk_practice::kiosk_practice {
     // ###################
 
 
+    // deletes the epoch
+    public fun delete_epoch(epoch: Epoch, ctx: &mut TxContext) {
+        let Epoch { id, start_time: _, end_time: _ } = epoch;
+        object::delete(id);
+    }
+
+
+
     public fun delete_game_owner_cap(game_owner_cap: GameOwnerCap, ctx: &mut TxContext) {
         let GameOwnerCap { id } = game_owner_cap;
         object::delete(id);
     }
+
+
+
+    // deletes the prediction
+    public fun delete_prediction(prediction: Prediction, ctx: &mut TxContext) {
+
+        let Prediction { id, prediction_id: _, prediction: _, timestamp: _ } = prediction;
+        object::delete(id);
+
+    }
+
+
+
+
 
    
 
@@ -718,16 +747,6 @@ module kiosk_practice::kiosk_practice {
 }
 
 
-
-// ###################################
-// ############TODO###################
-// ###################################
-
-// only need one value as a + b = 538
-// tests
-// add variable to pull data from the switchboard prototype
-// ptb for making predictions/ connect to front end
-// add display for the prediction
 
 
 
