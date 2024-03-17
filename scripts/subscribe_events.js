@@ -14,12 +14,8 @@ const keypairdev = Ed25519Keypair.fromSecretKey(privateKeyBytes);
 
 
 // Constants
-const Package_id = '0xf19b5c0a1fb5291fbd7bb9f1fcee14f5912f7a8c11adc77a4391b75c4f21e313';
-// const eventsToSubscribe = [
-//     `0xf19b5c0a1fb5291fbd7bb9f1fcee14f5912f7a8c11adc77a4391b75c4f21e313::kiosk_practice::TimeEvent`,
-//     `0xf19b5c0a1fb5291fbd7bb9f1fcee14f5912f7a8c11adc77a4391b75c4f21e313::kiosk_practice::GameStarted`,
-//     `0xf19b5c0a1fb5291fbd7bb9f1fcee14f5912f7a8c11adc77a4391b75c4f21e313::kiosk_practice::PredictionMade`,
-// ];
+const Package = "0xf5733f359175cb8f6b08fdc927a7dab4680d2255788a83f9afbe748d08602b99";
+
 
 
 
@@ -40,23 +36,24 @@ const client = new SuiClient({
 
         console.log(
             await client.getObject({
-                id: Package_id,
+                id: Package,
                 options: { showPreviousTransaction: true },
             }),
         );
 
 
 
-        const Package = "0xf19b5c0a1fb5291fbd7bb9f1fcee14f5912f7a8c11adc77a4391b75c4f21e313"
-        let unsubscribe = await client.subscribeEvent({
-            filter: { Package },
-            onMessage: (event) => {
-                console.log("subscribeEvent", JSON.stringify(event, null, 2))
-            }
-        });
+
+        // let unsubscribe = await client.subscribeEvent({
+        //     filter: { Package },
+        //     onMessage: (event) => {
+        //         console.log('subscribeEvent', JSON.stringify(event, null, 2));
+        //     },
+        // });
          
-        // later, to unsubscribe:
-        await unsubscribe();
+       
+
+        // await unsubscribe();
 
 
 

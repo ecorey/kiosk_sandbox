@@ -48,7 +48,7 @@ const upgrade_cap = "";
 
 // TIME STAMPS (election event on Nov. 5)
 // get from get time event log
-const predict_start_time = 1710621232132;
+const predict_start_time = 1710631841064;
 // November 3, 2024, at 12:00 AM (GMT)
 const predict_end_time = 1730592000000;
 
@@ -58,6 +58,7 @@ const report_start_time = 1731196800000;
 // December 1, 2024 at 12:00 AM (GMT)
 const report_end_time = 1733011200000;
  
+const ownerAddress = '0x07095af51002db0e9be284b8dab97263f77fec2a1be68cd42b7dd2358a6eccdd'; 
 
 const game_price = 1000000;
 
@@ -77,7 +78,7 @@ const client = new SuiClient({
 });
 
 
-const ownerAddress = ''; 
+
 
 
 
@@ -102,15 +103,15 @@ const ownerAddress = '';
 
         // GET THE CURRENT TIME
 
-        async function logCurrentTime() {
-            await txb.moveCall({
-                target: `${PACKAGE_ID}::kiosk_practice::get_time`,
-                arguments: [txb.object(clock)],
-            });
+        // async function logCurrentTime() {
+        //     await txb.moveCall({
+        //         target: `${PACKAGE_ID}::kiosk_practice::get_time`,
+        //         arguments: [txb.object(clock)],
+        //     });
            
-        }
+        // }
 
-        await logCurrentTime();
+        // await logCurrentTime();
         
         
 
@@ -146,19 +147,14 @@ const ownerAddress = '';
 
 
 
-        // GET THE GAME BALANCE
+        // GET THE GAME BALANCE VIA EVENT LOG [TEST]
 
         // async function logGameBalance() {
             
-        //     const game_balance = await txb.moveCall({
+        //      await txb.moveCall({
         //         target: `${PACKAGE_ID}::kiosk_practice::get_game_balance`,
         //         arguments: [ txb.object(game_id) ],
         //     });
-
-        //     const bal = game_balance[1];
-        //     const a = bal.index;
-
-        //     console.log(`Game balance: ${a}`);
            
         // }
 
@@ -171,24 +167,24 @@ const ownerAddress = '';
 
         // ADD A BALANCE TO THE GAME
 
-        // const amount_to_add = 2000000;
+        // const coin_to_add = "0x1a3959723e52ecad24672e1812e718c2ca8cf6d9aaecedbd2fe80993998c12e4";
 
         // txb.moveCall({
         //     target: `${PACKAGE_ID}::kiosk_practice::add_game_balance`,
-        //     arguments: [ txb.object(game_id), txb.pure.u64(amount_to_add) ],
+        //     arguments: [ txb.object(game_id), txb.object(coin_to_add) ],
         // });
 
 
 
 
 
-        //WITHDRAW THE BALANCE FROM THE GAME
+        //WITHDRAW THE BALANCE FROM THE GAME [TEST]
 
-        // let amount = 0;
+        // let amount = 518295497;
 
         // txb.moveCall({
         //     target: `${PACKAGE_ID}::kiosk_practice::withdraw_balance_from_game`,
-        //     arguments: [ txb.object(game_owner_cap), txb.object(game_id), txb.pure.u64(amount)],
+        //     arguments: [ txb.object(game_id), txb.pure.u64(amount)],
         // });
 
         
@@ -211,7 +207,7 @@ const ownerAddress = '';
 
         // txb.moveCall({
         //     target: `${PACKAGE_ID}::kiosk_practice::delete_game_owner_cap`,
-        //     arguments: [ txb.object(end_game_cap)],
+        //     arguments: [ txb.object(game_owner_cap)],
         // });
 
 
