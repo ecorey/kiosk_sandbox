@@ -5,7 +5,7 @@
 
 
 
-// ORDER OF SCRIPTS AFTER PUBLISHING PACKAGE
+// ORDER OF SCRIPTS AFTER PUBLISHING PACKAGE 
 
 // 1. node subscribe_events.js [FIX]
 
@@ -18,16 +18,23 @@
 
 
 // 7. node withdraw_bal_from_game.js [FIX]
-// 8. MAKE PREDICTIONS [TODO]
-// - make prediction
+
+// 8. node make_prediction.js
+
+
+
 // 9. KIOSK SCRIPTS [TODO]
 // - get kiosk
 // - place prediciton in kiosk
 // - list prediciton in kiosk
 // - purchase with another wallet
 // - delist prediction from kiosk
+// - withdraw balance from kiosk and transfer policy
 // 10. WINNER SCRIPTS [TODO]
 // - get winner
+
+
+
 
 
 // 11. node close_game.js 
@@ -46,15 +53,15 @@ export const DEV_WALLET = "0x07095af51002db0e9be284b8dab97263f77fec2a1be68cd42b7
 
 
 // created in init
-export const PACKAGE = "0xbb09ac4797ff8dd20210d016681896f3f472e99eb764edd151c64ca47f41c2d5";
-export const itemType = `${PACKAGE}::kiosk_practice::Prediction`;
-export const START_GAME_CAP = "0x641db2a8cbd3cd3dd8ab5b9cfc375054ccf8c39db222615881bbc2290260de18";
-export const END_GAME_CAP = "0x607aaf624bc5394fb458da44748cd6fb003b84f95379f3475890a8b8d0acdf29";
-export const GAME_OWNER_CAP = "0xa5bac3318d2234e87a7ae8ff069e9179f8d6c1459a54cd96d5467dcc33ab0172";
-export const TRANSFER_POLICY  = "";
-export const TRANSFER_POLICY_CAP = "";
+export const PACKAGE = "0xcd57af4426f53698e011dac73ca0703d6399eb8f83fbd9e3ddd75c0e2de7db56";
+export const START_GAME_CAP = "0xa4ecb4b05c0137e5178658a8beec84373e5d90de20b590312ed071e5ed23a5c4";
+export const END_GAME_CAP = "0xdab932fd52efb97360f96789ee0973cb637e5331fc1bc818ae13bbaa3e1a86fb";
+export const GAME_OWNER_CAP = "0xca747f2cdafe81220973ed5be0aa468102628585ec6af232f7191c48ce9dbdf0";
+export const TRANSFER_POLICY  = "export const itemType = `${PACKAGE}::kiosk_practice::Prediction`;";
+export const TRANSFER_POLICY_CAP = "0x2ff59d79e8c34f79d62f8c2ee4db27cf2bc00efca6b94783ad2e0d96274d9028";
 export const PUBLISHER = "";
 export const UPGRADE_CAP = "";
+export const itemType = `${PACKAGE}::kiosk_practice::Prediction`;
 
 
 // START GAME SCRIPT
@@ -62,7 +69,7 @@ export const GAME_PRICE = "1000000";
 
 // (election event on Nov. 5)
 // get from get time event log
-export const PREDICT_START_TIME = 1710649628204;
+export const PREDICT_START_TIME = 1710651841557;
 
 // November 3, 2024, at 12:00 AM (GMT)
 export const PREDICT_END_TIME = 1730592000000;
@@ -78,13 +85,13 @@ export const REPORT_END_TIME = 1733011200000;
 
 //CLOSE GAME SCRIPT
 // game id
-export const GAME_ID = "0xcb60ff9d1e20bb364d1deca9184c53e728923aa12b6e4fb9e392f28431511cd3";
+export const GAME_ID = "0xfda03fa340647d1e87e42cb56a135c5b5b5cd066bd8cf366342b9c8df497bd09";
 
 
 
 
 // ADD BALANCE TO GAME SCRIPT
-export const COIN_TO_ADD = "0x7a3c612ffa71ae0d321b268613b6844e582603860f8bc102a88db4c9cbff8f13";
+export const COIN_TO_ADD = "0x58e0ccb2acbdb75aef883e1b61710cfe371d4e3e993715499526e7965acdc9b5";
 
 
 

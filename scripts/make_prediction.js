@@ -5,14 +5,12 @@ import walletDev from './dev-wallet.json' assert { type: 'json' };
 
 import { WebSocket } from 'ws';
 
-import { PACKAGE, GAME_ID, GAME_OWNER_CAP } from './config.js';
+import {  PACKAGE, CLOCK  } from './config.js';
 
 
-// UNDER DEVELOPMENT***********************
-// ****************************************
-// ########################################
-// ############WITHDRAW GAME BALANCE#######
-// ########################################
+// ###################################
+// ############MAKE PREDICTION########
+// ###################################
 
 
 
@@ -46,19 +44,12 @@ const client = new SuiClient({
 
 
 
-         // [TESTING]
-
-        
-        txb.setGasBudget(10000000);
-
         txb.moveCall({
-            target: `${PACKAGE}::kiosk_practice::withdraw_balance_from_game`,
-            arguments: [txb.object(GAME_OWNER_CAP), txb.object(GAME_ID), txb.pure.u64(400000000)],
+            target: `${PACKAGE}::kiosk_practice::make_prediction`,
+            arguments: [  txb.pure.u64(223), txb.object(CLOCK) ],
         });
 
         
-
-
 
 
         
@@ -70,7 +61,7 @@ const client = new SuiClient({
         
 
 
-        // log the transaction result
+        // // log the transaction result
         console.log(`Transaction result: ${JSON.stringify(txid, null, 2)}`);
         console.log(`success: https://suiexplorer.com/txblock/${txid.digest}?network=testnet`);
 
