@@ -1,12 +1,10 @@
-// imports
-import { getFullnodeUrl, SuiClient, SuiHTTPTransport  } from "@mysten/sui.js/client";
+import { getFullnodeUrl, SuiClient, SuiHTTPTransport } from "@mysten/sui.js/client";
 import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
 import { TransactionBlock } from "@mysten/sui.js/transactions";
+import { WebSocket } from 'ws';
 import wallet from './dev-wallet.json' assert { type: 'json' };
 import { KioskClient, Network, KioskTransaction } from '@mysten/kiosk';
-import { WebSocket } from 'ws';
-
-
+import {  PREDICTION, ITEMTYPE } from './config.js';
 
 // generate a keypair
 const privateKeyArray = wallet.privateKey.split(',').map(num => parseInt(num, 10));
@@ -14,12 +12,7 @@ const privateKeyBytes = new Uint8Array(privateKeyArray);
 const keypair = Ed25519Keypair.fromSecretKey(privateKeyBytes);
 
 
-console.log(`Public Key raw bytes: ${keypair.getPublicKey().toRawBytes()}`);
 
-console.log(`Public Key: ${keypair.getPublicKey().toSuiAddress()}`);
-
-
-const itemType = '0xd32b20876598c0d1c903a2834c857278435c8da704a6e2183c6e1c704eb72efe::kiosk_practice::Prediction';
 
 
 // client
@@ -29,6 +22,7 @@ const client = new SuiClient({
         WebSocketConstructor: WebSocket
     }),
 });
+
 
 
 // kiosk client
@@ -41,9 +35,7 @@ const kioskClient = new KioskClient({
 
 const getCap = async () => {
     let { kioskOwnerCaps } = await kioskClient.getOwnedKiosks(keypair.getPublicKey().toRawBytes());
-    // Assume that the user has only 1 kiosk.
-    // Here, you need to do some more checks in a realistic scenario.
-    // And possibly give the user in our dApp a kiosk selector to choose which one they want to interact with (if they own more than one).
+   
     return kioskOwnerCaps[0];
 }
 
@@ -69,36 +61,22 @@ const getCap = async () => {
 
         
 
-
-        
-
-       
-
-
-
-
-
-        
     
         // place a prediction in the kiosk (works)
         const prediction_id = kioskTx.place({
-            item: txb.object(prediction),
-            itemType: itemType,
+            item: txb.object(PREDICTION),
+            itemType: ITEMTYPE,
         });
 
+        
 
 
+        console.log(`Prediction ID: ${prediction_id} placed in kiosk`);
 
     
 
 
-        // take the prediction from the kiosk
-        kioskTx.take({
-            itemType: prediction,
-            itemId: prediction_id,
-        });
-
-
+        
 
 
 

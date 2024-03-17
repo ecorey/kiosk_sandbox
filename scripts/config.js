@@ -20,25 +20,29 @@
 // 7. node withdraw_bal_from_game.js [FIX]
 
 // 8. node make_prediction.js
+// 9. node create_kiosk_and_place.js
 
 
 
-// 9. KIOSK SCRIPTS [TODO]
-// - get kiosk
+//   KIOSK SCRIPTS [TODO]
 // - place prediciton in kiosk
 // - list prediciton in kiosk
 // - purchase with another wallet
 // - delist prediction from kiosk
 // - withdraw balance from kiosk and transfer policy
-// 10. WINNER SCRIPTS [TODO]
+//   WINNER SCRIPTS [TODO]
 // - get winner
 
 
 
 
 
-// 11. node close_game.js 
-// 12. node delete_owner_cap.js 
+// 98. node close_game.js 
+// 99. node delete_owner_cap.js 
+
+
+
+
 
 
 
@@ -61,7 +65,7 @@ export const TRANSFER_POLICY  = "export const itemType = `${PACKAGE}::kiosk_prac
 export const TRANSFER_POLICY_CAP = "0x2ff59d79e8c34f79d62f8c2ee4db27cf2bc00efca6b94783ad2e0d96274d9028";
 export const PUBLISHER = "";
 export const UPGRADE_CAP = "";
-export const itemType = `${PACKAGE}::kiosk_practice::Prediction`;
+export const ITEMTYPE = `${PACKAGE}::kiosk_practice::Prediction`;
 
 
 // START GAME SCRIPT
@@ -96,11 +100,13 @@ export const COIN_TO_ADD = "0x58e0ccb2acbdb75aef883e1b61710cfe371d4e3e9937154995
 
 
 
-
 // GAME RESULT SCRIPT
 export const GAME_RESULT = "223";
 
 
+
+// PREDCITION SCRIPT
+export const PREDICTION = "0x25f29b28e9c74114dd576689f05c833379ff8b7525339d0aa75e4ce1f06c4d06";
 
 
 
