@@ -22,14 +22,13 @@
 // 8. node make_prediction.js
 // 9. node create_kiosk_and_place.js
 // 10. node kiosk_list_prediction.js
+// 11. node kiosk_delist_prediction.js
+
 
 
 
 //   KIOSK SCRIPTS [TODO]
-// - place prediciton in kiosk
-// - list prediciton in kiosk
 // - purchase with another wallet
-// - delist prediction from kiosk
 // - withdraw balance from kiosk and transfer policy
 //   WINNER SCRIPTS [TODO]
 // - get winner
