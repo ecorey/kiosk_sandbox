@@ -82,6 +82,11 @@
 // ####################################################
 
 
+
+/// USE EPOCH AS TIMESTAMP?
+//  epoch 311 started Mar 16, 11:20 AM
+
+
 module kiosk_practice::kiosk_practice {
 
     use sui::kiosk::{Self, Kiosk, KioskOwnerCap};
@@ -185,7 +190,22 @@ module kiosk_practice::kiosk_practice {
     //     prediction: Option<u64>,
     //     made_by: address,
     //     time: u64,
-    // }
+    // 
+
+
+    // GET TIME
+
+    struct TimeEvent has copy, drop, store {
+        timestamp_ms: u64
+    }
+
+    
+    public fun get_time(clock: &Clock)  {
+        event::emit(TimeEvent {
+            timestamp_ms: clock::timestamp_ms(clock),
+        });
+
+    }
 
 
 
@@ -510,43 +530,60 @@ module kiosk_practice::kiosk_practice {
     // ############KIOSK LOGIC############
     // ###################################
 
+
+
+
+    // done in ptb
+    // place, take, list, delist, purchase 
     
 
 
-    // burns the prediction from the kiosk and deletes the prediction
-    public fun burn_from_kiosk( kiosk: &mut Kiosk, kiosk_cap: &KioskOwnerCap, prediction_id: ID, tp: &TransferPolicy<Prediction>, ctx: &mut TxContext) {
+   
+    
+    // ###################################
+    // ############GETTER/ SETTER LOGIC###
+    // ###################################
 
-        let purchase_cap = kiosk::list_with_purchase_cap<Prediction>( kiosk, kiosk_cap, prediction_id, 0, ctx); 
-        let ( prediction, transfer_request)  = kiosk::purchase_with_cap<Prediction>(kiosk, purchase_cap, coin::zero<SUI>(ctx));
-        tp::confirm_request<Prediction>( tp, transfer_request  );
+    struct GameBalance has copy, drop {
+        balance: u64,
+    }
 
-        let Prediction {id, prediction_id: _, prediction: _, timestamp: _} = prediction;
-        object::delete(id);
 
+    // gets the game balance
+    public fun get_game_balance(game: &Game) : u64 {
+        
+        let bal = balance::value<SUI>(&game.pot);
+
+        event::emit(GameBalance {
+            balance: bal,
+        });
+
+        bal
     }
 
 
 
-  
-
-
-
+    // puts a coin into the game balance
+    public fun add_game_balance(game: &mut Game, deposit: Coin<SUI>, ctx: &mut TxContext) {
+        let pot = &mut game.pot;
+        balance::join(pot, coin::into_balance(deposit));
+    }
 
 
 
     
     // ###################
-    // WITHDRAW FUNCTIONS
+    // WITHDRAW FUNCTIONS#
     // ###################
 
-    // withdraw from a personal kiosk
+    // withdraw from a personal kiosk [untested]
     public fun withdraw_balance_from_kiosk(kiosk: &mut Kiosk, kiosk_owner_cap: &KioskOwnerCap, amount: Option<u64>, ctx: &mut TxContext) : Coin<SUI> {
         kiosk::withdraw(kiosk, kiosk_owner_cap, amount, ctx)
     }
 
 
 
-    // withdraw from the transfer policy
+    // withdraw from the transfer policy [untested]
     public fun withdraw_balance_from_tranfer_policy( transfer_policy: &mut TransferPolicy<Prediction>, transfer_policy_cap: &TransferPolicyCap<Prediction>, amount: Option<u64>, ctx: &mut TxContext ) : Coin<SUI> {
         tp::withdraw(transfer_policy, transfer_policy_cap, amount, ctx)
     }
@@ -554,14 +591,32 @@ module kiosk_practice::kiosk_practice {
 
 
     // withdraw from game balance
-    fun withdraw_balance_from_game(_: &GameOwnerCap, game: &mut Game, amount: Option<u64>, ctx: &mut TxContext) : Balance<SUI> {
-        balance::withdraw_all<SUI>(&mut game.pot)
+   public fun withdraw_balance_from_game(_: &GameOwnerCap, game: &mut Game, amount: u64, ctx: &mut TxContext) {
+       
+        assert!(game.game_closed, EGameNotClosed);  
+        
+        let withdrawal = balance::split(&mut game.pot, amount);
+    
+        let bal = coin::from_balance(withdrawal, ctx);
+
+        transfer::public_transfer(bal, tx_context::sender(ctx));
     }
 
 
 
 
 
+    // ###################
+    // CLEANUP FUNCTIONS##
+    // ###################
+
+
+    public fun delete_game_owner_cap(game_owner_cap: GameOwnerCap, ctx: &mut TxContext) {
+        let GameOwnerCap { id } = game_owner_cap;
+        object::delete(id);
+    }
+
+   
 
     // ###################################
     // ############TESTS##################

@@ -2,7 +2,7 @@
 import { getFullnodeUrl, SuiClient, SuiHTTPTransport  } from "@mysten/sui.js/client";
 import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
 import { TransactionBlock } from "@mysten/sui.js/transactions";
-import walletDev from './wallet-two.json' assert { type: 'json' };
+import walletDev from './dev-wallet.json' assert { type: 'json' };
 import walletOne from './wallet-one.json' assert { type: 'json' };
 
 import { KioskClient, Network, KioskTransaction } from '@mysten/kiosk';

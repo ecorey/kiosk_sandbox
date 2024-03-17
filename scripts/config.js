@@ -2,6 +2,43 @@
 // ############CONFIG#################
 // ###################################
 
+
+
+
+// ORDER OF SCRIPTS AFTER PUBLISHING PACKAGE
+
+// 1. node subscribe_events.js [FIX]
+
+
+// 2. node current_time.js (use to set PREDICT_START_TIME in config.js)
+// 3. node start_game.js (use to set GAME_ID in config.js)
+// 4. node game_balance.js (check before adding to game balance)
+// 5. node add_balance_to_game.js (set COIN_TO_ADD in config.js)
+// 6. node game_balance.js (check after adding the game balance)
+
+
+// 7. node withdraw_bal_from_game.js [FIX]
+// 8. MAKE PREDICTIONS [TODO]
+// - make prediction
+// 9. KIOSK SCRIPTS [TODO]
+// - get kiosk
+// - place prediciton in kiosk
+// - list prediciton in kiosk
+// - purchase with another wallet
+// - delist prediction from kiosk
+// 10. WINNER SCRIPTS [TODO]
+// - get winner
+
+
+// 11. node close_game.js 
+// 12. node delete_owner_cap.js 
+
+
+
+// ###################################
+// ############CONSTS#################
+// ###################################
+
 export const CLOCK = "0x6";
 
 
@@ -25,7 +62,7 @@ export const GAME_PRICE = "1000000";
 
 // (election event on Nov. 5)
 // get from get time event log
-export const PREDICT_START_TIME = 1710645132788;
+export const PREDICT_START_TIME = 1710649628204;
 
 // November 3, 2024, at 12:00 AM (GMT)
 export const PREDICT_END_TIME = 1730592000000;
@@ -41,13 +78,13 @@ export const REPORT_END_TIME = 1733011200000;
 
 //CLOSE GAME SCRIPT
 // game id
-export const GAME_ID = "";
+export const GAME_ID = "0xcb60ff9d1e20bb364d1deca9184c53e728923aa12b6e4fb9e392f28431511cd3";
 
 
 
 
 // ADD BALANCE TO GAME SCRIPT
-export const COIN_TO_ADD = "";
+export const COIN_TO_ADD = "0x7a3c612ffa71ae0d321b268613b6844e582603860f8bc102a88db4c9cbff8f13";
 
 
 

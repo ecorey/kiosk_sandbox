@@ -1,7 +1,7 @@
 import { getFullnodeUrl, SuiClient, SuiHTTPTransport } from "@mysten/sui.js/client";
 import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
 import { WebSocket } from 'ws';
-import walletDev from './wallet-four.json' assert { type: 'json' };
+import walletDev from './dev-wallet.json' assert { type: 'json' };
 
 import {  PACKAGE } from './config.js';
 
@@ -22,10 +22,12 @@ const keypairdev = Ed25519Keypair.fromSecretKey(privateKeyBytes);
 
 
 // contract events
-const eventsToSubscribe = [
+const eventsToSubscribe = [ 
     `${PACKAGE}::kiosk_practice::TimeEvent`,
     `${PACKAGE}::kiosk_practice::GameStarted`,
     `${PACKAGE}::kiosk_practice::PredictionMade`,
+    `${PACKAGE}::kiosk_practice::GameOpen`,
+    
 ];
 
 
