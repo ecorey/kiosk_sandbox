@@ -1,11 +1,12 @@
-// imports
 import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
 import wallet from './dev-wallet.json' assert { type: 'json' };
 
 import { decodeSuiPrivateKey } from '@mysten/sui.js/cryptography';
 
 
-
+// ###############################################
+// ############CREATE NEW KEYPAIR#################
+// ###############################################
 
 
 // 1 RUN: sui client new-address ed25519
