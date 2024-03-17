@@ -48,7 +48,7 @@ const upgrade_cap = "";
 
 // TIME STAMPS (election event on Nov. 5)
 // get from get time event log
-const predict_start_time = 1710631841064;
+const predict_start_time = 1710639956026;
 // November 3, 2024, at 12:00 AM (GMT)
 const predict_end_time = 1730592000000;
 
@@ -58,7 +58,7 @@ const report_start_time = 1731196800000;
 // December 1, 2024 at 12:00 AM (GMT)
 const report_end_time = 1733011200000;
  
-const ownerAddress = '0x07095af51002db0e9be284b8dab97263f77fec2a1be68cd42b7dd2358a6eccdd'; 
+const ownerAddress = ''; 
 
 const game_price = 1000000;
 
@@ -84,7 +84,6 @@ const client = new SuiClient({
 
 // const coins = await client.getCoins({ owner: ownerAddress });
 // console.log(`Coins owned by ${ownerAddress}:`, JSON.stringify(coins, null, 2));
-
 
 
 (async () => {
@@ -167,7 +166,7 @@ const client = new SuiClient({
 
         // ADD A BALANCE TO THE GAME
 
-        // const coin_to_add = "0x1a3959723e52ecad24672e1812e718c2ca8cf6d9aaecedbd2fe80993998c12e4";
+        // const coin_to_add = "0x6e789d9bf6ba0a1f57d10273f08c1ffe2b0c5bba6c1e8128c04ad083fe0b5b3c";
 
         // txb.moveCall({
         //     target: `${PACKAGE_ID}::kiosk_practice::add_game_balance`,
@@ -180,11 +179,11 @@ const client = new SuiClient({
 
         //WITHDRAW THE BALANCE FROM THE GAME [TEST]
 
-        // let amount = 518295497;
+        // let amount = 2;
 
         // txb.moveCall({
         //     target: `${PACKAGE_ID}::kiosk_practice::withdraw_balance_from_game`,
-        //     arguments: [ txb.object(game_id), txb.pure.u64(amount)],
+        //     arguments: [txb.object(game_owner_cap), txb.object(game_id), txb.pure.u64(amount)],
         // });
 
         
