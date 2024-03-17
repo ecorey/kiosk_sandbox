@@ -21,6 +21,7 @@
 
 // 8. node make_prediction.js
 // 9. node create_kiosk_and_place.js
+// 10. node kiosk_list_prediction.js
 
 
 
@@ -107,8 +108,13 @@ export const GAME_RESULT = "223";
 
 // PREDCITION SCRIPT
 export const PREDICTION = "0x25f29b28e9c74114dd576689f05c833379ff8b7525339d0aa75e4ce1f06c4d06";
+export const PREDICTION_ID = "0x25f29b28e9c74114dd576689f05c833379ff8b7525339d0aa75e4ce1f06c4d06";
 
 
+
+// KIOSK SCRIPT
+export const KIOSK = "0xf9c26f45757096716492210edc25cb846088a6300185137375cbc2ba5ea70dde";
+export const KIOSK_OWNER_CAP = "0x6a7421356a817ad2c948ad84356612a13034c431b95360c8bad9520b14eaf554";
 
 
 
