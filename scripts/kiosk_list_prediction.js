@@ -4,13 +4,12 @@ import { TransactionBlock } from "@mysten/sui.js/transactions";
 import { WebSocket } from 'ws';
 import wallet from './dev-wallet.json' assert { type: 'json' };
 import { KioskClient, Network, KioskTransaction } from '@mysten/kiosk';
-import {  PREDICTION, PREDICTION_ID, ITEMTYPE } from './config.js';
+import {  PREDICTION_TWO, PREDICTION_ID, ITEMTYPE } from './config.js';
 
 // generate a keypair
 const privateKeyArray = wallet.privateKey.split(',').map(num => parseInt(num, 10));
 const privateKeyBytes = new Uint8Array(privateKeyArray);
 const keypair = Ed25519Keypair.fromSecretKey(privateKeyBytes);
-
 
 
 
@@ -56,33 +55,29 @@ const getCap = async () => {
 
 
 
-        // create a new kiosk
-        kioskTx.create();
-
-        
         txb.setGasBudget(10000000);
         
     
         kioskTx.list({
-            itemType: ITEMTYPE,
-            itemId: PREDICTION_ID,
+            itemType: `${ITEMTYPE}`,
+            itemId: `${PREDICTION_TWO}`,
             price: 10000000
         });
 
         
 
         
-        console.log(`prediction listed: ${PREDICTION_ID}`);
+        console.log(`prediction listed in kiosk`);
         
 
         kioskTx.shareAndTransferCap(keypair.getPublicKey().toRawBytes());
+
 
         // finalize the kiosk transaction
         kioskTx.finalize();
         
         
 
-        
         // finalize the transaction block
         let txid = await client.signAndExecuteTransactionBlock({
             signer: keypair,

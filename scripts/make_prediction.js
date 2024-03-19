@@ -5,7 +5,7 @@ import walletDev from './dev-wallet.json' assert { type: 'json' };
 
 import { WebSocket } from 'ws';
 
-import {  PACKAGE, CLOCK  } from './config.js';
+import {  PACKAGE, CLOCK, GUESS  } from './config.js';
 
 
 // ###################################
@@ -46,7 +46,7 @@ const client = new SuiClient({
 
         txb.moveCall({
             target: `${PACKAGE}::kiosk_practice::make_prediction`,
-            arguments: [  txb.pure.u64(223), txb.object(CLOCK) ],
+            arguments: [  txb.pure.u64(GUESS), txb.object(CLOCK) ],
         });
 
         
