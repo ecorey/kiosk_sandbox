@@ -4,7 +4,7 @@ import { TransactionBlock } from "@mysten/sui.js/transactions";
 import { WebSocket } from 'ws';
 import wallet from './dev-wallet.json' assert { type: 'json' };
 import { KioskClient, Network, KioskTransaction } from '@mysten/kiosk';
-import {  PREDICTION_TWO, PREDICTION_ID, ITEMTYPE } from './config.js';
+import {  PREDICTION_TWO, ITEMTYPE } from './config.js';
 
 // generate a keypair
 const privateKeyArray = wallet.privateKey.split(',').map(num => parseInt(num, 10));
@@ -30,13 +30,9 @@ const kioskClient = new KioskClient({
     network: Network.TESTNET,
 });
 
+const { kioskOwnerCaps } = await kioskClient.getOwnedKiosks({ address: keypair.getPublicKey().toSuiAddress()});
 
 
-const getCap = async () => {
-    let { kioskOwnerCaps } = await kioskClient.getOwnedKiosks(keypair.getPublicKey().toRawBytes());
-   
-    return kioskOwnerCaps[0];
-}
 
 
 
@@ -51,7 +47,7 @@ const getCap = async () => {
 
 
         // create Kiosk TxBlock
-        const kioskTx = new KioskTransaction({ kioskClient, transactionBlock: txb, cap: await getCap() });
+        const kioskTx = new KioskTransaction({ kioskClient, transactionBlock: txb,  cap: kioskOwnerCaps[0] });
 
 
 
