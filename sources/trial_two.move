@@ -137,7 +137,16 @@ module kiosk_practice::kiosk_practice {
     // ################################## 
 
     // struct to hold game times
-    struct Epoch has key, store {
+    struct PredictEpoch has key, store {
+       id: UID,
+       start_time: u64,
+       end_time: u64,
+
+    }
+
+
+    // struct to hold game times
+    struct ReportEpoch has key, store {
        id: UID,
        start_time: u64,
        end_time: u64,
@@ -176,8 +185,8 @@ module kiosk_practice::kiosk_practice {
         price: u64,
         pot: Balance<SUI>, 
         result: Option<u64>,  
-        predict_epoch: Epoch, 
-        report_epoch: Epoch, 
+        predict_epoch: PredictEpoch, 
+        report_epoch: ReportEpoch, 
         game_closed: bool, 
         winner_claimed: bool, 
         
@@ -222,7 +231,10 @@ module kiosk_practice::kiosk_practice {
 
 
     // create a new game instance
-    fun new_game(price: u64, predict_epoch: Epoch, report_epoch: Epoch, ctx: &mut TxContext) : Game {
+    fun new_game(price: u64, predict_epoch: PredictEpoch, report_epoch: ReportEpoch, ctx: &mut TxContext) : Game {
+       
+        
+       
         Game {
             id: object::new(ctx),
             price, 
@@ -233,13 +245,16 @@ module kiosk_practice::kiosk_practice {
             game_closed: false,
             winner_claimed: false,
         }
+
+        
+
     }
 
 
   
 
     // startst the game and allows predictions to be made
-    public fun start_game(start_game_cap: StartGameCap, price: u64, predict_epoch: Epoch, report_epoch: Epoch, clock: &Clock, ctx: &mut TxContext)  {
+    public fun start_game(start_game_cap: StartGameCap, price: u64, predict_epoch: PredictEpoch, report_epoch: ReportEpoch, clock: &Clock, ctx: &mut TxContext)  {
 
        
 
@@ -259,10 +274,13 @@ module kiosk_practice::kiosk_practice {
 
         let game = new_game(price, predict_epoch, report_epoch, ctx);
         
-        transfer::share_object(game);
+        transfer::public_share_object(game);
 
         let StartGameCap { id } = start_game_cap;
         object::delete(id);
+
+
+        
         
     }
 
@@ -361,9 +379,9 @@ module kiosk_practice::kiosk_practice {
     
 
 
-    public fun set_predict_epoch(start_time: u64, end_time: u64, ctx: &mut TxContext) : Epoch  {
+    public fun set_predict_epoch(start_time: u64, end_time: u64, ctx: &mut TxContext) : PredictEpoch  {
         
-        let predict_epoch  = Epoch {
+        let predict_epoch  = PredictEpoch {
             id: object::new(ctx),
             start_time,
             end_time,
@@ -376,9 +394,9 @@ module kiosk_practice::kiosk_practice {
 
 
 
-    public fun set_report_epoch(start_time: u64, end_time: u64, ctx: &mut TxContext) : Epoch {
+    public fun set_report_epoch(start_time: u64, end_time: u64, ctx: &mut TxContext) : ReportEpoch {
         
-        let report_epoch  = Epoch {
+        let report_epoch  = ReportEpoch {
             id: object::new(ctx),
             start_time,
             end_time,
@@ -621,8 +639,15 @@ module kiosk_practice::kiosk_practice {
 
 
     // deletes the epoch
-    public fun delete_epoch(epoch: Epoch, ctx: &mut TxContext) {
-        let Epoch { id, start_time: _, end_time: _ } = epoch;
+    public fun delete_predict_epoch(predict_epoch: PredictEpoch, ctx: &mut TxContext) {
+        let PredictEpoch { id, start_time: _, end_time: _ } = predict_epoch;
+        object::delete(id);
+    }
+
+
+     // deletes the epoch
+    public fun delete_report_epoch(report_epoch: ReportEpoch, ctx: &mut TxContext) {
+        let ReportEpoch { id, start_time: _, end_time: _ } = report_epoch;
         object::delete(id);
     }
 
