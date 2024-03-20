@@ -13,8 +13,6 @@ module kiosk_practice::trial_two_tests {
     use sui::kiosk::{Self, Kiosk, KioskOwnerCap, PurchaseCap};
     
     
-
-    
     use sui::test_scenario;
     use sui::test_utils::create_one_time_witness;
     use sui::kiosk_test_utils::{Self as test, Asset};
@@ -23,7 +21,10 @@ module kiosk_practice::trial_two_tests {
 
     use kiosk_practice::kiosk_practice::GameOwnerCap;
     use kiosk_practice::kiosk_practice::init_for_testing;
+    use kiosk_practice::kiosk_practice::make_prediction;
+    use kiosk_practice::kiosk_practice::delete_prediction;
     use kiosk_practice::kiosk_practice::KIOSK_PRACTICE;
+    use kiosk_practice::kiosk_practice::Prediction;
 
 
 
@@ -69,8 +70,7 @@ module kiosk_practice::trial_two_tests {
 
         let admin = @0x1;
         let user1 = @0x2;
-        // let scenario = test_scenario::begin(admin);
-        // let scenario_val = &mut scenario;
+       
 
         
         let scenario = init_test_helper();
@@ -78,23 +78,23 @@ module kiosk_practice::trial_two_tests {
 
 
 
-        // // test the sender has the game owner cap 
-        // test_scenario::next_tx(scenario_val, admin);
-        // {
+        // test the sender has the game owner cap 
+        test_scenario::next_tx(scenario_val, admin);
+        {
             
-        //     let ctx = test_scenario::ctx(scenario_val);
-        //     let sender_address = tx_context::sender(ctx);
-        //     assert!(sender_address == admin, 0);
+            let ctx = test_scenario::ctx(scenario_val);
+            let sender_address = tx_context::sender(ctx);
+            assert!(sender_address == admin, 0);
 
-        //     let game_owner_cap = test_scenario::take_from_sender<GameOwnerCap>(scenario_val);
-        //     test_scenario::return_to_sender(scenario_val, game_owner_cap);
+            let game_owner_cap = test_scenario::take_from_sender<GameOwnerCap>(scenario_val);
+            test_scenario::return_to_sender(scenario_val, game_owner_cap);
             
-        // };
+        };
 
 
-        // test making a prediction
-        // TODO
-        // fix the transfer policy in the test then test for the prediction
+
+
+        // make a prediction
         test_scenario::next_tx(scenario_val, admin);
         {
 
@@ -116,10 +116,9 @@ module kiosk_practice::trial_two_tests {
             
             
 
-            // MAKE PREDICTION AND BURN PREDICTION
+            // MAKE PREDICTION 
             
-
-
+            make_prediction(guess, &clock, test_scenario::ctx(scenario_val));
 
 
             // CLEANUP 
@@ -137,6 +136,35 @@ module kiosk_practice::trial_two_tests {
 
 
         
+
+
+        test_scenario::next_tx(scenario_val, admin);
+        {
+             
+
+            let predict = test_scenario::take_from_sender<Prediction>(scenario_val);
+
+            // test_scenario::return_to_sender(scenario_val, predict);  
+
+
+            delete_prediction(predict, test_scenario::ctx(scenario_val));
+
+ 
+        };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
        
         
         
@@ -147,4 +175,5 @@ module kiosk_practice::trial_two_tests {
     
 
 
-}
+    }
+

@@ -530,16 +530,9 @@ module kiosk_practice::kiosk_practice {
 
 
 
-   
 
 
 
-
-    
-
-
-
-    
     // ###################################
     // ############KIOSK LOGIC############
     // ###################################
@@ -634,7 +627,7 @@ module kiosk_practice::kiosk_practice {
     }
 
 
-
+   // deletes the game owner cap
     public fun delete_game_owner_cap(game_owner_cap: GameOwnerCap, ctx: &mut TxContext) {
         let GameOwnerCap { id } = game_owner_cap;
         object::delete(id);
@@ -652,50 +645,14 @@ module kiosk_practice::kiosk_practice {
 
 
 
+
+    // wrapper for the init function allowing it to be called from the test module
     #[test_only]
     public fun init_for_testing(otw: KIOSK_PRACTICE, ctx: &mut TxContext) {
         init(otw, ctx);
     }
 
    
-
-    // // ###################################
-    // // ############TESTS##################
-    // // ###################################
-
-    // #[test]
-    // public fun test_init() {
-
-    //     use sui::test_scenario;
-    //     use sui::test_utils;
-    //     use sui::kiosk_test_utils::{Self as test, Asset};
-    //     use std::debug;
-
-    //     let admin = @0x1;
-    //     let user1 = @0x2;
-    //     let scenario = test_scenario::begin(admin);
-    //     let scenario_val = &mut scenario;
-
-    //     let otw = KIOSK_PRACTICE {};
-
-
-    //     // test the init function
-    //     {
-            
-    //         init(otw, test_scenario::ctx(scenario_val));
-            
-            
-    //     };
-
-       
-               
-    //     test_scenario::end(scenario);   
-
-    // }
-
-    
-
-
 
 
 }
