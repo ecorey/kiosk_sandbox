@@ -113,8 +113,8 @@ module kiosk_practice::kiosk_practice {
 
 
 
-    // #[test_only]
-    // friend kiosk_practice::trial_two_tests;
+    #[test_only]
+    friend kiosk_practice::trial_two_tests;
     
 
 
@@ -414,12 +414,14 @@ module kiosk_practice::kiosk_practice {
     }
 
 
+
+
     // init creates the transfer policy and stores it in the regisry which is a shared object 
     // and transfers the transfer policy cap and game owner cap to the sender
     fun init(otw: KIOSK_PRACTICE, ctx: &mut TxContext) {
 
-        
 
+        
         let publisher = package::claim(otw, ctx);
 
 
@@ -650,7 +652,10 @@ module kiosk_practice::kiosk_practice {
 
 
 
-
+    #[test_only]
+    public fun init_for_testing(otw: KIOSK_PRACTICE, ctx: &mut TxContext) {
+        init(otw, ctx);
+    }
 
    
 
@@ -658,35 +663,35 @@ module kiosk_practice::kiosk_practice {
     // // ############TESTS##################
     // // ###################################
 
-    #[test]
-    public fun test_init() {
+    // #[test]
+    // public fun test_init() {
 
-        use sui::test_scenario;
-        use sui::test_utils;
-        use sui::kiosk_test_utils::{Self as test, Asset};
-        use std::debug;
+    //     use sui::test_scenario;
+    //     use sui::test_utils;
+    //     use sui::kiosk_test_utils::{Self as test, Asset};
+    //     use std::debug;
 
-        let admin = @0x1;
-        let user1 = @0x2;
-        let scenario = test_scenario::begin(admin);
-        let scenario_val = &mut scenario;
+    //     let admin = @0x1;
+    //     let user1 = @0x2;
+    //     let scenario = test_scenario::begin(admin);
+    //     let scenario_val = &mut scenario;
 
-        let otw = KIOSK_PRACTICE {};
+    //     let otw = KIOSK_PRACTICE {};
 
 
-        // test the init function
-        {
+    //     // test the init function
+    //     {
             
-            init(otw, test_scenario::ctx(scenario_val));
+    //         init(otw, test_scenario::ctx(scenario_val));
             
             
-        };
+    //     };
 
        
                
-        test_scenario::end(scenario);   
+    //     test_scenario::end(scenario);   
 
-    }
+    // }
 
     
 

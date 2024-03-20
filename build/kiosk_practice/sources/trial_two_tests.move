@@ -16,14 +16,15 @@ module kiosk_practice::trial_two_tests {
 
     
     use sui::test_scenario;
-    use sui::test_utils::assert_eq;
+    use sui::test_utils::create_one_time_witness;
     use sui::kiosk_test_utils::{Self as test, Asset};
     use std::debug;
 
 
     use kiosk_practice::kiosk_practice::GameOwnerCap;
-    use kiosk_practice::kiosk_practice::init;
-    
+    use kiosk_practice::kiosk_practice::init_for_testing;
+    use kiosk_practice::kiosk_practice::KIOSK_PRACTICE;
+
 
 
   
@@ -33,6 +34,34 @@ module kiosk_practice::trial_two_tests {
     // ############TESTS##################
     // ###################################
 
+
+    
+    
+
+
+    fun init_test_helper() : test_scenario::Scenario {
+
+            let admin = @0x1;
+            let user1 = @0x2;
+
+
+            let scenario = test_scenario::begin(admin);
+            let scenario_val = &mut scenario;
+
+
+            let otw = create_one_time_witness<KIOSK_PRACTICE>();
+
+
+            {
+                init_for_testing(otw, test_scenario::ctx(scenario_val));
+            };
+
+            scenario
+
+        }
+
+
+
     #[test]
     public fun predictix_tests() {
 
@@ -40,10 +69,15 @@ module kiosk_practice::trial_two_tests {
 
         let admin = @0x1;
         let user1 = @0x2;
-        let scenario = test_scenario::begin(admin);
-        let scenario_val = &mut scenario;
+        // let scenario = test_scenario::begin(admin);
+        // let scenario_val = &mut scenario;
 
         
+        let scenario = init_test_helper();
+        let scenario_val = &mut scenario;
+
+
+
         // // test the sender has the game owner cap 
         // test_scenario::next_tx(scenario_val, admin);
         // {
@@ -63,7 +97,7 @@ module kiosk_practice::trial_two_tests {
         // fix the transfer policy in the test then test for the prediction
         test_scenario::next_tx(scenario_val, admin);
         {
-            
+
             // setup
             let guess = 444;
 
