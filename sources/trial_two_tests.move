@@ -140,26 +140,6 @@ module kiosk_practice::trial_two_tests {
 
 
 
-
-        // ADMIN CLOSE GAME
-        test_scenario::next_tx(scenario_val, admin);
-        {
-
-            let game = test_scenario::take_shared<Game>(scenario_val);
-
-            let end_game_cap = test_scenario::take_from_sender<EndGameCap>(scenario_val);
-           
-            let game_closed = close_game(end_game_cap, &mut game, 444, test_scenario::ctx(scenario_val)); 
-
-            assert!(game_closed == true, 0);
-
-            test_scenario::return_shared(game);
-
-        };
-
-
-
-
         // ADMIN MAKES PREDICTION
         test_scenario::next_tx(scenario_val, admin);
         {
@@ -211,7 +191,6 @@ module kiosk_practice::trial_two_tests {
 
 
         };
-
 
 
 
@@ -382,22 +361,19 @@ module kiosk_practice::trial_two_tests {
 
 
 
-
-        // USER LISTS AND DELISTS PREDICTION
+        // ADMIN CLOSE GAME
         test_scenario::next_tx(scenario_val, admin);
         {
+
+            let game = test_scenario::take_shared<Game>(scenario_val);
+
+            let end_game_cap = test_scenario::take_from_sender<EndGameCap>(scenario_val);
            
+            let game_closed = close_game(end_game_cap, &mut game, 444, test_scenario::ctx(scenario_val)); 
 
-        };
+            assert!(game_closed == true, 0);
 
-
-      
-
-
-        // ADMIN CLOSES GAME
-        test_scenario::next_tx(scenario_val, admin);
-        {
-           
+            test_scenario::return_shared(game);
 
         };
 
@@ -413,7 +389,8 @@ module kiosk_practice::trial_two_tests {
 
 
 
-        // 
+
+        // TEMPLATE
         test_scenario::next_tx(scenario_val, admin);
         {
            
@@ -423,6 +400,8 @@ module kiosk_practice::trial_two_tests {
 
         
         
+
+
         test_scenario::end(scenario);   
 
     }
@@ -430,5 +409,5 @@ module kiosk_practice::trial_two_tests {
     
 
 
-    }
+}
 
