@@ -313,7 +313,7 @@ module kiosk_practice::trial_two_tests {
 
 
 
-            // // ADMIN
+            // ADMIN
 
             // let admin_kiosk = test_scenario::take_shared<Kiosk>(scenario_val);
             // let admin_cap = test_scenario::take_from_sender<KioskOwnerCap>(scenario_val);
