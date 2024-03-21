@@ -353,8 +353,6 @@ module kiosk_practice::trial_two_tests {
         test_scenario::next_tx(scenario_val, admin);
         {
 
-
-
             // ADMIN
 
             // // create admin kiosk
@@ -363,19 +361,29 @@ module kiosk_practice::trial_two_tests {
             transfer::public_share_object(admin_kiosk_two);
             transfer::public_transfer(admin_cap_two, admin);
 
+            let admin_cap_two = test_scenario::take_from_sender<KioskOwnerCap>(scenario_val); 
+            test_scenario::return_to_sender(scenario_val, admin_cap_two);
 
-            let admin_cap_two = test_scenario::take_from_sender<KioskOwnerCap>(scenario_val);
+
             let admin_policy_two = test_scenario::take_shared<TransferPolicy<Prediction>>(scenario_val);
-
+            test_scenario::return_shared(admin_policy_two);
+            
 
             
-            test_scenario::return_to_sender(scenario_val, admin_cap_two);
-            test_scenario::return_shared(admin_policy_two);
+
+            
+            
 
 
 
             let clock = clock::create_for_testing(test_scenario::ctx(scenario_val));
             let guess = 444;
+
+            // make_prediction(guess, &clock, test_scenario::ctx(scenario_val));
+
+
+
+
 
 
             // let predict = test_scenario::take_from_sender<Prediction>(scenario_val);
@@ -383,17 +391,16 @@ module kiosk_practice::trial_two_tests {
             // let prediction_id = object::id(&predict);
 
 
-            // kiosk::place(&mut admin_kiosk, &admin_cap, predict);
-            // assert_eq(kiosk::has_item(&admin_kiosk, prediction_id), true);
+            // kiosk::place(&mut admin_kiosk_two, &admin_cap_two, predict);
+            // assert_eq(kiosk::has_item(&admin_kiosk_two, prediction_id), true);
+
 
 
             
-            // kiosk::list<Prediction>(&mut admin_kiosk, &admin_cap, prediction_id, 10);
-
-
-
-
-
+            // kiosk::list<Prediction>(&mut admin_kiosk_two, &admin_cap_two, prediction_id, 10);
+            // test_scenario::return_to_sender(scenario_val, admin_cap_two);
+            
+            
             
         
         
@@ -402,15 +409,12 @@ module kiosk_practice::trial_two_tests {
             // USER1  
 
             // Create a Kiosk share it public and transfer the cap to owner
-            let (user_kiosk_two, user_cap_two) = kiosk::new(test_scenario::ctx(scenario_val));
-            transfer::public_share_object(user_kiosk_two);
-            transfer::public_transfer(user_cap_two, user1);
+            // let (user_kiosk_two, user_cap_two) = kiosk::new(test_scenario::ctx(scenario_val));
+            // transfer::public_share_object(user_kiosk_two);
+            // transfer::public_transfer(user_cap_two, user1);
 
 
-            let user_cap_two = test_scenario::take_from_sender<KioskOwnerCap>(scenario_val);
-
-            test_scenario::return_to_sender(scenario_val, user_cap_two);
-
+            
 
 
             // let coin = coin::mint_for_testing<SUI>(10, test_scenario::ctx(scenario_val));
@@ -433,7 +437,10 @@ module kiosk_practice::trial_two_tests {
 
 
             
-           
+            // let user_cap_two = test_scenario::take_from_sender<KioskOwnerCap>(scenario_val);
+
+            // test_scenario::return_to_sender(scenario_val, user_cap_two);
+
 
             clock::destroy_for_testing(clock); 
             
