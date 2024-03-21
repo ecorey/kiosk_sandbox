@@ -409,9 +409,15 @@ module kiosk_practice::trial_two_tests {
             // USER1  
 
             // Create a Kiosk share it public and transfer the cap to owner
-            // let (user_kiosk_two, user_cap_two) = kiosk::new(test_scenario::ctx(scenario_val));
-            // transfer::public_share_object(user_kiosk_two);
-            // transfer::public_transfer(user_cap_two, user1);
+            let (user_kiosk_two, user_cap_two) = kiosk::new(test_scenario::ctx(scenario_val));
+            transfer::public_share_object(user_kiosk_two);
+            transfer::public_transfer(user_cap_two, user1);
+
+            let user_cap_two = test_scenario::take_from_sender<KioskOwnerCap>(scenario_val); 
+            test_scenario::return_to_sender(scenario_val, user_cap_two);
+
+
+            
 
 
             
@@ -431,15 +437,12 @@ module kiosk_practice::trial_two_tests {
             // transfer_policy::confirm_request(&policy, request);
 
             
-            // transfer::public_share_object(user_kiosk);
-            // transfer::public_transfer(user_cap, user1);
+           
             
 
 
             
-            // let user_cap_two = test_scenario::take_from_sender<KioskOwnerCap>(scenario_val);
-
-            // test_scenario::return_to_sender(scenario_val, user_cap_two);
+            
 
 
             clock::destroy_for_testing(clock); 
