@@ -86,7 +86,7 @@ module kiosk_practice::trial_two_tests {
 
 
 
-        // TEST SENDER HAS START GAME CAP AND INIT WAS SUCCESSFUL
+        // TEST SENDER IS ADMIN AND HAS THE START GAME CAP 
         test_scenario::next_tx(scenario_val, admin);
         {
             
@@ -128,18 +128,32 @@ module kiosk_practice::trial_two_tests {
 
 
 
-            // let end_game_cap = test_scenario::take_from_sender<EndGameCap>(scenario_val);
-            // let game = test_scenario::take_from_sender<Game>(scenario_val);
+            let end_game_cap = test_scenario::take_from_sender<EndGameCap>(scenario_val);
 
             // let game_closed = close_game(end_game_cap, &mut game, 444, test_scenario::ctx(scenario_val)); 
 
-
-            // test_scenario::return_to_sender(scenario_val, game);
+            test_scenario::return_to_sender(scenario_val, end_game_cap);
+            
 
 
             
 
         };
+
+
+
+
+        // Take and return the game object
+        test_scenario::next_tx(scenario_val, admin);
+        {
+           
+            let game = test_scenario::take_shared<Game>(scenario_val);
+
+            test_scenario::return_shared(game);
+
+        };
+
+
 
 
 
