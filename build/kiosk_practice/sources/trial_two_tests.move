@@ -374,8 +374,8 @@ module kiosk_practice::trial_two_tests {
 
 
 
-            // let clock = clock::create_for_testing(test_scenario::ctx(scenario_val));
-            // let guess = 444;
+            let clock = clock::create_for_testing(test_scenario::ctx(scenario_val));
+            let guess = 444;
 
 
             // let predict = test_scenario::take_from_sender<Prediction>(scenario_val);
@@ -402,9 +402,14 @@ module kiosk_practice::trial_two_tests {
             // USER1  
 
             // Create a Kiosk share it public and transfer the cap to owner
-            // let (user_kiosk, user_cap) = kiosk::new(test_scenario::ctx(scenario_val));
-             
-            // let user_cap = test_scenario::take_from_sender<KioskOwnerCap>(scenario_val);
+            let (user_kiosk_two, user_cap_two) = kiosk::new(test_scenario::ctx(scenario_val));
+            transfer::public_share_object(user_kiosk_two);
+            transfer::public_transfer(user_cap_two, user1);
+
+
+            let user_cap_two = test_scenario::take_from_sender<KioskOwnerCap>(scenario_val);
+
+            test_scenario::return_to_sender(scenario_val, user_cap_two);
 
 
 
@@ -430,7 +435,7 @@ module kiosk_practice::trial_two_tests {
             
            
 
-            // clock::destroy_for_testing(clock); 
+            clock::destroy_for_testing(clock); 
             
 
 
