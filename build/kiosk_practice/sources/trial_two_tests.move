@@ -140,26 +140,6 @@ module kiosk_practice::trial_two_tests {
 
 
 
-
-        // ADMIN CLOSE GAME
-        test_scenario::next_tx(scenario_val, admin);
-        {
-
-            let game = test_scenario::take_shared<Game>(scenario_val);
-
-            let end_game_cap = test_scenario::take_from_sender<EndGameCap>(scenario_val);
-           
-            let game_closed = close_game(end_game_cap, &mut game, 444, test_scenario::ctx(scenario_val)); 
-
-            assert!(game_closed == true, 0);
-
-            test_scenario::return_shared(game);
-
-        };
-
-
-
-
         // ADMIN MAKES PREDICTION
         test_scenario::next_tx(scenario_val, admin);
         {
@@ -211,7 +191,6 @@ module kiosk_practice::trial_two_tests {
 
 
         };
-
 
 
 
@@ -304,20 +283,96 @@ module kiosk_practice::trial_two_tests {
 
 
 
+        // ADMIN CLOSE GAME
+        test_scenario::next_tx(scenario_val, admin);
+        {
+
+            let game = test_scenario::take_shared<Game>(scenario_val);
+
+            let end_game_cap = test_scenario::take_from_sender<EndGameCap>(scenario_val);
+           
+            let game_closed = close_game(end_game_cap, &mut game, 444, test_scenario::ctx(scenario_val)); 
+
+            assert!(game_closed == true, 0);
+
+            test_scenario::return_shared(game);
+
+        };
 
 
 
+
+        // USER CLAIMS WINNER
+        test_scenario::next_tx(scenario_val, admin);
+        {
+           
+
+        };
+
+
+
+
+        // TEMPLATE
+        test_scenario::next_tx(scenario_val, admin);
+        {
+           
+
+        };
+
+
+        
+        
+
+
+        test_scenario::end(scenario);   
+
+    }
+
+
+
+
+
+
+
+    public fun kiosk_tests(){
+
+
+        let admin = @0x1;
+        let user1 = @0x2;
+       
+
+        
+        let scenario = init_test_helper();
+        let scenario_val = &mut scenario;
+
+
+
+
+        // TEMPLATE
         // ANOTHER USER CREATES A KIOSK AND PURCHASES PREDICTION FROM ADMIN
-        test_scenario::next_tx(scenario_val, user1);
+        test_scenario::next_tx(scenario_val, admin);
         {
 
 
 
-            // // ADMIN
+            // ADMIN
 
-            // let admin_kiosk = test_scenario::take_shared<Kiosk>(scenario_val);
-            // let admin_cap = test_scenario::take_from_sender<KioskOwnerCap>(scenario_val);
-            // let admin_policy = test_scenario::take_shared<TransferPolicy<Prediction>>(scenario_val);
+            // // create admin kiosk
+    
+            let (admin_kiosk_two, admin_cap_two) = kiosk::new(test_scenario::ctx(scenario_val));
+            transfer::public_share_object(admin_kiosk_two);
+            transfer::public_transfer(admin_cap_two, admin);
+
+
+            let admin_cap_two = test_scenario::take_from_sender<KioskOwnerCap>(scenario_val);
+            let admin_policy_two = test_scenario::take_shared<TransferPolicy<Prediction>>(scenario_val);
+
+
+            
+            test_scenario::return_to_sender(scenario_val, admin_cap_two);
+            test_scenario::return_shared(admin_policy_two);
+
+
 
             // let clock = clock::create_for_testing(test_scenario::ctx(scenario_val));
             // let guess = 444;
@@ -344,12 +399,12 @@ module kiosk_practice::trial_two_tests {
         
 
 
-            // // USER1  
+            // USER1  
 
-            // // Create a Kiosk share it public and transfer the cap to owner
-            // let (kiosk, cap) = kiosk::new(test_scenario::ctx(scenario_val));
-            // // let (policy, policy_cap) = test::get_policy(test_scenario::ctx(scenario_val));
-            // let policy = test_scenario::take_shared<TransferPolicy<Prediction>>(scenario_val); 
+            // Create a Kiosk share it public and transfer the cap to owner
+            // let (user_kiosk, user_cap) = kiosk::new(test_scenario::ctx(scenario_val));
+             
+            // let user_cap = test_scenario::take_from_sender<KioskOwnerCap>(scenario_val);
 
 
 
@@ -367,68 +422,39 @@ module kiosk_practice::trial_two_tests {
             // transfer_policy::confirm_request(&policy, request);
 
             
-            // transfer::public_share_object(kiosk);
-            // transfer::public_transfer(cap, user1);
-            // test_scenario::return_shared(policy);
+            // transfer::public_share_object(user_kiosk);
+            // transfer::public_transfer(user_cap, user1);
+            
+
+
+            
+           
 
             // clock::destroy_for_testing(clock); 
-            // test_scenario::return_shared(admin_kiosk);
-            // test_scenario::return_to_sender(scenario_val, admin_cap);
-            // test_scenario::return_shared(admin_policy);
+            
 
 
         };
 
-
-
-
-
-        // USER LISTS AND DELISTS PREDICTION
-        test_scenario::next_tx(scenario_val, admin);
-        {
-           
-
-        };
-
-
-      
-
-
-        // ADMIN CLOSES GAME
-        test_scenario::next_tx(scenario_val, admin);
-        {
-           
-
-        };
-
-
-
-
-        // USER CLAIMS WINNER
-        test_scenario::next_tx(scenario_val, admin);
-        {
-           
-
-        };
-
-
-
-        // 
-        test_scenario::next_tx(scenario_val, admin);
-        {
-           
-
-        };
 
 
         
         
-        test_scenario::end(scenario);   
+
+
+        test_scenario::end(scenario);  
+
+
+
+
+
 
     }
 
     
 
 
-    }
+}
+
+
 
