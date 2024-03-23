@@ -106,8 +106,8 @@ export const GAME_RESULT = "223";
 
 
 // PREDCITION SCRIPT
-export const PREDICTION = "";
-export const PREDICTION_ID = "";
+export const PREDICTION = "0xf2a6c426ae44abb525f5375fedc2d167f086af09268b41333f103623dd4f6545";
+export const PREDICTION_ID = "0xf2a6c426ae44abb525f5375fedc2d167f086af09268b41333f103623dd4f6545";
 
 export const PREDICTION_TWO = "";
 

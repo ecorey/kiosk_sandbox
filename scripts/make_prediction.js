@@ -5,7 +5,7 @@ import walletDev from './dev-wallet.json' assert { type: 'json' };
 
 import { WebSocket } from 'ws';
 
-import {  PACKAGE, CLOCK, GUESS, GAME_ID  } from './config.js';
+import {  PACKAGE, CLOCK, GUESS, GAME_ID, DEV_WALLET  } from './config.js';
 
 
 // ###################################
@@ -42,23 +42,19 @@ const client = new SuiClient({
         const txb = new TransactionBlock();
 
 
-        // get user balance
-        const balance = await client.getBalance({ address: keypairdev.getPublicKey().toSuiAddress()} );
-
-        console.log(`Balance: ${JSON.stringify(balance, null, 2)}`);
-
-        const coin = await client.getCoins({ address: keypairdev.getPublicKey().toSuiAddress()} );
-
-        let paymentCoin = txb.splitCoins(coin, 100);
-
         
-        
+        txb.setGasBudget(10000000);
 
 
+        // Create a new coin with balance 100, based on the coins used as gas payment.
+        // You can define any balance here.
+        const [coin] = txb.splitCoins(txb.gas, [txb.pure(1000000)]);
+
+    
         // make_prediction( predict: u64, payment: Coin<SUI>, game: &mut Game, clock: &Clock, ctx: &mut TxContext)
         txb.moveCall({
             target: `${PACKAGE}::kiosk_practice::make_prediction`,
-            arguments: [  txb.pure.u64(GUESS), txb.object(paymentCoin), txb.object(GAME_ID), txb.object(CLOCK) ],
+            arguments: [  txb.pure.u64(GUESS), txb.object(coin), txb.object(GAME_ID), txb.object(CLOCK) ],
         });
 
         
